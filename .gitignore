@@ -30,3 +30,6 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# YouTube API
+client_secret.json
