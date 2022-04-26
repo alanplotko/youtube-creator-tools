@@ -1,5 +1,7 @@
 import { useSession, getSession } from 'next-auth/react';
-import clientPromise from '@/lib/mongodb';
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export default function ProjectView({ project }) {
     const { data: session } = useSession();
@@ -21,10 +23,12 @@ export async function getServerSideProps(context) {
             },
         };
     }
-    const client = await clientPromise;
-    const project = await client.db()
-        .collection('projects')
-        .findOne({ slug: context.params.slug });
+    const project = await prisma.projects
+        .findUnique({
+            where: {
+                slug: context.params.slug
+            }
+        });
     if (project == null) {
         return {
             redirect: {

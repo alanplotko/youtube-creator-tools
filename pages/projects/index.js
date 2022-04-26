@@ -1,9 +1,11 @@
 import { useSession, getSession } from 'next-auth/react';
-import clientPromise from '@/lib/mongodb';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navigation from 'components/navigation';
 import moment from 'moment';
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export default function Projects({ projects }) {
   const { data: session } = useSession();
@@ -88,13 +90,14 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const client = await clientPromise;
-  const projects = await client.db()
-    .collection('projects')
-    .find({ user: session.user.name })
-    .sort({ createdAt: -1 })
-    .limit(5)
-    .toArray();
+  const projects = await prisma.projects.findMany({
+    where: {
+      user: session.user.name
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  });
   return {
     props: {
       session,

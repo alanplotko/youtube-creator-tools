@@ -1,5 +1,7 @@
 import { getSession } from 'next-auth/react';
-import clientPromise from '@/lib/mongodb';
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
     switch (req.method) {
@@ -26,16 +28,14 @@ export default async function handler(req, res) {
             }
             project.createdAt = new Date();
             project.user = session.user.name;
-            const client = await clientPromise;
-            return await client.db()
-                .collection('projects')
-                .insertOne(project)
+            return await prisma.projects
+                .create({ data: project })
                 .then(() => {
                     return res.status(200).json({
                         message: "Successfully saved project."
                     });
                 }).catch(err => {
-                    if (err && err.code === 11000) {
+                    if (err && err.code === "P2002") {
                         return res.status(400).json({
                             error: {
                                 code: 400,

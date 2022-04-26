@@ -33,3 +33,6 @@ yarn-error.log*
 
 # YouTube API
 client_secret.json
+
+# Sqlite DB
+*.db
