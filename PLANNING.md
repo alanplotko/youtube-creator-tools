@@ -12,7 +12,7 @@
     - https://developers.google.com/youtube/v3/docs/search/list
 4. Select videos in scope to verify results and persist video IDs for said project
 5. Generate CSV file with IDs and columns to update. Populate locally by hand.
-6. Reupload and verify CSV fields. Ensure thumbnails are within bounds (2MB limit). Collect user confirmation that data looks correct. Estimate quota and ensure action is in bounds of completion. Block otherwise, or ask user to confirm that it's ok to proceed with as many updates as possible. Resume function when more units available on next refresh.
+6. Reupload and verify CSV fields. Ensure thumbnails are within bounds (3MB limit). Collect user confirmation that data looks correct. Estimate quota and ensure action is in bounds of completion. Block otherwise, or ask user to confirm that it's ok to proceed with as many updates as possible. Resume function when more units available on next refresh.
     - https://developers.google.com/youtube/v3/docs/videos/update
     - https://developers.google.com/youtube/v3/docs/thumbnails/set
 

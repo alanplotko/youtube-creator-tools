@@ -53,12 +53,13 @@ model VerificationToken {
 }
 
 model Projects {
-    id          String   @id @default(auto()) @map("_id") @db.ObjectId
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    name        String
-    slug        String   @unique
-    description String
-    thumbnail   String
-    user        String
+    id              String   @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    name            String
+    slug            String   @unique
+    description     String
+    image_thumbnail String
+    image_cover     String
+    user            String
 }

@@ -11,8 +11,8 @@ export default function Login() {
     return (
       <div className='flex h-screen'>
         <Navigation user={session.user} />
-        <div className='m-auto px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10'>
-          <div className='text-center mb-4 text-xl font-light text-gray-600 sm:text-3xl dark:text-white'>
+        <div className='m-auto px-4 py-8 bg-white rounded-lg shadow sm:px-6 md:px-8 lg:px-10'>
+          <div className='text-center mb-4 text-xl font-light text-gray-600 sm:text-3xl'>
             Welcome back, {session.user.name}!
           </div>
           <div className='text-center mb-4'>
@@ -35,8 +35,8 @@ export default function Login() {
     return (
       <div className='flex h-screen'>
         <Navigation />
-        <div className='m-auto px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10'>
-          <div className='text-center mb-4 text-xl font-light text-gray-600 sm:text-3xl dark:text-white'>
+        <div className='m-auto px-4 py-8 bg-white rounded-lg shadow sm:px-6 md:px-8 lg:px-10'>
+          <div className='text-center mb-4 text-xl font-light text-gray-600 sm:text-3xl'>
             Hi there!
           </div>
           <div className='text-center mb-4'>
@@ -55,7 +55,7 @@ export default function Login() {
     return (
       <div className='flex h-screen'>
         <Navigation />
-        <div className='m-auto px-4 py-8 bg-white rounded-lg shadow dark:bg-gray-800 sm:px-6 md:px-8 lg:px-10'>
+        <div className='m-auto px-4 py-8 bg-white rounded-lg shadow sm:px-6 md:px-8 lg:px-10'>
         <div className="w-64 h-44 bg-gray-200 animate-pulse"></div>
           <div className="mt-8 h-32 w-full space-y-3">
             <div className="w-20 h-6 bg-gray-200 rounded-full animate-pulse"></div>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useSession, getSession } from 'next-auth/react';
-import Image from 'next/image';
 import Link from 'next/link';
 import Navigation from 'components/navigation';
 import axios from 'axios';
@@ -26,7 +25,10 @@ export default function ProjectForm() {
     const [state, setState] = useState({
         override: false,
         isLoading: false,
-        error: null
+        error: null,
+        uploadValid: null,
+        uploadResultMessage: "Attach a file",
+        uploadFileName: null
     });
     const handleOverrideSlug = (e) => {
         e.preventDefault();
@@ -38,6 +40,35 @@ export default function ProjectForm() {
             override: !state.override
         });
     };
+    const handleSizeLimitCheck = (e) => {
+        e.preventDefault();
+        let input = document.querySelector('input#thumbnail');
+        let uploadValid = null;
+        let uploadResultMessage = null;
+        let uploadFileName = null;
+        if (!['image/png', 'image/jpeg'].includes(input.files[0].type)) {
+            input.value = '';
+            uploadValid = false;
+            uploadResultMessage = "File is not of type PNG, JPG, or JPEG, please select a valid file.";
+        } else if (input.files[0].size > 3000000) {
+            input.value = '';
+            uploadValid = false;
+            uploadResultMessage = "File size > 3MB, please select a smaller file.";
+        } else {
+            uploadValid = true;
+            uploadResultMessage = "File selected!";
+            uploadFileName = input.files[0].name;
+            if (uploadFileName.length > 20) {
+                uploadFileName = uploadFileName.substr(0,10) + "..." + uploadFileName.substr(-8);
+            }
+        }
+        setState({
+            ...state,
+            uploadValid,
+            uploadResultMessage,
+            uploadFileName
+        });
+    };
     const handleSubmit = async (e) => {
         e.preventDefault();
         setState({
@@ -45,21 +76,20 @@ export default function ProjectForm() {
             isLoading: true
         });
 
-        let project = Object.fromEntries(new FormData(document.querySelector('form#createProject')));
+        let project = new FormData(document.querySelector('form#createProject'));
         // Use axios to submit the form
         await axios.post("/api/projects", project)
-            .then((result) => {
-                console.log(result);
+            .then(result => {
                 setState({
                     ...state,
                     isLoading: false,
                     error: null,
                     success: true,
-                    projectLink: `/projects/${project.slug}`,
-                    projectName: project.name,
+                    projectLink: `/projects/${result.data.project.slug}`,
+                    projectName: result.data.project.name
                 });
                 document.querySelector('form#createProject').reset();
-            }).catch((err) => {
+            }).catch(err => {
                 let error = err?.response?.data?.error;
                 let message = error ? `${error.code} Error: ${error.message}` : err.message;
                 setState({
@@ -69,7 +99,7 @@ export default function ProjectForm() {
                     error: message
                 });
             });
-    }
+    };
 
     if (session) {
         return (
@@ -107,7 +137,7 @@ export default function ProjectForm() {
                                                 <div className="col-span-6">
                                                     {/* Project Name */}
                                                     <label htmlFor="name" className="block first-line:text-md font-medium text-gray-700">
-                                                        Project Name
+                                                        Project Name <span className="text-red-500">*</span>
                                                     </label>
                                                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">A name for your project.</p>
                                                     <input
@@ -120,7 +150,7 @@ export default function ProjectForm() {
                                                         placeholder="Triangle Strategy Playthrough" />
                                                     {/* Project Slug */}
                                                     <label htmlFor="slug" className="block mt-5 first-line:text-md font-medium text-gray-700">
-                                                        Project Slug
+                                                        Project Slug <span className="text-red-500">*</span>
                                                     </label>
                                                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">The slug for the project page URL. Only lowercase letters, numbers, and dashes are allowed.</p>
                                                     <input
@@ -150,7 +180,7 @@ export default function ProjectForm() {
                                                     />
                                                     {/* Project Description */}
                                                     <label htmlFor="description" className="block mt-5 first-line:text-md font-medium text-gray-700">
-                                                        Project Description
+                                                        Project Description <span className="text-red-500">*</span>
                                                     </label>
                                                     <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">Describe what the project is about.</p>
                                                     <textarea
@@ -162,16 +192,23 @@ export default function ProjectForm() {
                                                     />
                                                     {/* Thumbnail URL */}
                                                     <label htmlFor="thumbnail" className="block mt-5 first-line:text-md font-medium text-gray-700">
-                                                        Thumbnail URL
+                                                        Upload Thumbnail <span className="text-red-500">*</span>
                                                     </label>
-                                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">An image URL for the projects page.</p>
-                                                    <input
-                                                        id="thumbnail"
-                                                        name="thumbnail"
-                                                        className="w-full h-12 px-4 mb-2 text-lg text-gray-700 placeholder-gray-600 border rounded-lg focus:shadow-outline shadow-sm"
-                                                        type="url"
-                                                        required="required"
-                                                        placeholder="E.g. https://unsplash.com/..." />
+                                                    <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">Upload a custom thumbnail for this project (3MB limit, type = PNG, JPG, or JPEG).</p>
+                                                    <div className="flex items-center justify-center w-full">
+                                                        <label className={`flex flex-col w-full h-32 border-4 border-dashed hover:bg-gray-100 ${state.uploadValid == null || state.uploadValid ? 'border-gray-200 hover:border-gray-300' : 'border-red-400 hover:border-red-500'}`}>
+                                                            <div className="flex flex-col items-center justify-center pt-7 cursor-pointer">
+                                                                <p className="flex items-center space-x-2 text-xl text-gray-400 group-hover:text-gray-600">
+                                                                    <i className={`bi bi-cloud-upload mr-2 text-4xl ${state.uploadValid == null || state.uploadValid ? 'text-gray-400 group-hover:text-gray-600' : 'text-red-400 group-hover:text-red-600'}`}></i>
+                                                                    {state.uploadFileName && state.uploadFileName}
+                                                                </p>
+                                                                <p className={`pt-1 text-md tracking-wider ${state.uploadValid == null || state.uploadValid ? 'text-gray-400 group-hover:text-gray-600' : 'text-red-400 group-hover:text-red-600'}`}>
+                                                                    {state.uploadResultMessage}
+                                                                </p>
+                                                            </div>
+                                                            <input id="thumbnail" type="file" name="thumbnail" onChange={handleSizeLimitCheck} className="opacity-0" required="required" />
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div className="px-4 py-3 mt-5 bg-gray-100 rounded-lg text-right sm:px-6">
@@ -192,7 +229,6 @@ export default function ProjectForm() {
                 </div>
             </div>
         );
-
     }
 }
 

@@ -3,9 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Navigation from 'components/navigation';
 import moment from 'moment';
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from 'lib/prisma';
 
 export default function Projects({ projects }) {
   const { data: session } = useSession();
@@ -23,7 +21,7 @@ export default function Projects({ projects }) {
           {projects.length == 0 && (
             <div className="mx-auto p-10 w-6/12 bg-white rounded-lg border shadow-md">
               <div className='text-center'>
-                <i className='bi bi-folder-plus text-gray-600' style={{ fontSize: 80 }} ></i>
+                <i className='bi bi-folder-plus text-gray-600' style={{ fontSize: 80 }}></i>
               </div>
               <h2 className="text-2xl text-center leading-6 text-gray-900 my-2">
                 No Projects
@@ -58,8 +56,8 @@ export default function Projects({ projects }) {
               </Link>
               {projects.map(project => (
                 <Link key={project._id} href={`/projects/${project.slug}`} passHref>
-                  <div className="bg-white rounded-lg border shadow-md max-w-xs md:max-w-none overflow-hidden cursor-pointer hover:shadow-lg hover:bg-gray-100">
-                    <Image width={1280} height={720} src={project.thumbnail} alt="Project Thumbnail" />
+                  <div className="bg-white rounded-lg border shadow-md max-w-xs md:max-w-none overflow-hidden cursor-pointer hover:shadow-lg hover:bg-gray-50">
+                    <Image width={400} height={225} src={project.image_thumbnail} alt={`Project thumbnail for ${project.name}`} />
                     <div className="p-3">
                       <span className="text-sm text-primary">{moment(project.createdAt).fromNow()}</span>
                       <h3 className="font-semibold text-xl leading-6 text-gray-700 my-2">

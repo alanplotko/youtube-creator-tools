@@ -1,9 +1,13 @@
 import { getSession } from 'next-auth/react';
-import { PrismaClient } from "@prisma/client";
+import middleware from 'middleware/middleware';
+import nextConnect from 'next-connect';
+import prisma from 'lib/prisma';
+import { v2 as cloudinary } from 'cloudinary';
 
-const prisma = new PrismaClient();
+const handler = nextConnect();
+handler.use(middleware);
 
-export default async function handler(req, res) {
+handler.post(async (req, res) => {
     switch (req.method) {
         case 'POST':
             return await createProject();
@@ -16,22 +20,40 @@ export default async function handler(req, res) {
             });
     }
 
+    async function uploadThumbnail(file, id) {
+        return cloudinary.uploader.upload(file.path, {
+            public_id: id,
+            upload_preset: 'project-thumbnail'
+        }, (error, result) => {
+            if (error) {
+                return error;
+            }
+            return result;
+        });
+    }
+
     async function createProject() {
         const session = await getSession({ req });
         if (session) {
             // Signed in
             let project = req.body;
-            try {
-                new URL(project.thumbnail);
-            } catch (err) {
-                return res.status(400).json({ error: "Invalid URL provided" });
+            let uploadResult = await uploadThumbnail(req.file, `${session.user.name}/${project.slug}`);
+            if (uploadResult.error) {
+                return res.status(500).json({
+                    error: {
+                        code: 500,
+                        error: 'Thumbnail upload failed, please try again.'
+                    }
+                });
             }
-            project.createdAt = new Date();
+            project.image_thumbnail = uploadResult.eager[0].secure_url;
+            project.image_cover = uploadResult.eager[1].secure_url;
             project.user = session.user.name;
             return await prisma.projects
                 .create({ data: project })
                 .then(() => {
                     return res.status(200).json({
+                        project,
                         message: "Successfully saved project."
                     });
                 }).catch(err => {
@@ -60,4 +82,12 @@ export default async function handler(req, res) {
             });
         }
     }
-}
+});
+
+export const config = {
+    api: {
+        bodyParser: false
+    }
+};
+
+export default handler;

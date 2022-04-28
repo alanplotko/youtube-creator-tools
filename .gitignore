@@ -36,3 +36,6 @@ client_secret.json
 
 # Sqlite DB
 *.db
+
+# VS Code settings
+.vscode
