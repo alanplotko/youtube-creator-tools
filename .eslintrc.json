@@ -38,7 +38,22 @@
         ],
         "jsx-a11y/label-has-associated-control": 0,
         "jsx-a11y/no-noninteractive-tabindex": 0,
-        "react/jsx-props-no-spreading": 0
+        "react/jsx-props-no-spreading": 0,
+        "sort-imports": [
+            "error",
+            {
+                "ignoreCase": false,
+                "ignoreDeclarationSort": false,
+                "ignoreMemberSort": false,
+                "memberSyntaxSortOrder": [
+                    "none",
+                    "all",
+                    "multiple",
+                    "single"
+                ],
+                "allowSeparatedGroups": false
+            }
+        ]
     },
     "settings": {
         "import/resolver": {

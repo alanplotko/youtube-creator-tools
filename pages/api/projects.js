@@ -1,9 +1,9 @@
-import { getSession } from 'next-auth/react';
-import nextConnect from 'next-connect';
-import prisma from '@/lib/prisma';
 import { v2 as cloudinary } from 'cloudinary';
 import errors from '@/constants/errors';
+import { getSession } from 'next-auth/react';
 import middleware from '@/middleware/middleware';
+import nextConnect from 'next-connect';
+import prisma from '@/lib/prisma';
 
 const handler = nextConnect();
 handler.use(middleware);

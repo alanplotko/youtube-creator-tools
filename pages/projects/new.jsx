@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useSession, getSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import Link from 'next/link';
 import axios from 'axios';
+import { useState } from 'react';
 
 function toSlug(s) {
   return s.toLowerCase()

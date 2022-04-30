@@ -1,4 +1,4 @@
-import { useSession, getSession } from 'next-auth/react';
+import { getSession, useSession } from 'next-auth/react';
 import prisma from '@/lib/prisma';
 
 export default function ProjectView({ project }) {

@@ -1,7 +1,7 @@
 import axios from 'axios';
+import errors from '@/constants/errors';
 import { getSession } from 'next-auth/react';
 import qs from 'qs';
-import errors from '@/constants/errors';
 
 const CHANNELS = 'https://youtube.googleapis.com/youtube/v3/channels';
 
