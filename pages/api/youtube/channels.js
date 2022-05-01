@@ -1,5 +1,5 @@
+import { buildError, errors } from '@/constants/errors';
 import axios from 'axios';
-import errors from '@/constants/errors';
 import { getSession } from 'next-auth/react';
 import qs from 'qs';
 
@@ -7,10 +7,12 @@ const CHANNELS = 'https://youtube.googleapis.com/youtube/v3/channels';
 
 export default async function handler(req, res) {
   const session = await getSession({ req });
+
+  // Signed in
   if (session) {
-    // Signed in
-    const result = await axios
-      .get(CHANNELS, {
+    try {
+      // Get general channel information
+      const response = await axios.get(CHANNELS, {
         headers: {
           Authorization: `Bearer ${session.accessToken}`,
         },
@@ -19,16 +21,19 @@ export default async function handler(req, res) {
           mine: true,
         },
         paramsSerializer: (params) => qs.stringify(params, { encode: false, arrayFormat: 'repeat' }),
-      })
-      .then((response) => res.status(response.status).json(response.data))
-      .catch((error) => {
-        if (error.response) {
-          return res.status(error.code).json(error.response.data);
-        }
-        return res.status(error.code).json(errors.PROJECTS_GENERIC_ERROR);
       });
-    return result;
+
+      return res.status(response.status).json(response.data);
+    } catch (e) {
+      // Catch YouTube API error
+      if (e.response) {
+        return res.status(e.code).json(e.response.data);
+      }
+      // Catch all other errors
+      return buildError(res, errors.PROJECTS_GENERIC_SAVE_ERROR, { code: e.code });
+    }
   }
+
   // Not signed in
-  return res.status(401).json(errors.UNAUTHORIZED);
+  return buildError(res, errors.UNAUTHORIZED);
 }

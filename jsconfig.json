@@ -13,6 +13,9 @@
       ],
       "@/middleware/*": [
         "middleware/*"
+      ],
+      "@/styles/*": [
+        "styles/*"
       ]
     }
   }

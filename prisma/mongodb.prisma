@@ -5,6 +5,7 @@ datasource db {
 
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["extendedIndexes"]
 }
 
 model Account {
@@ -62,4 +63,7 @@ model Projects {
     image_thumbnail String
     image_cover     String
     user            String
+    archived        Boolean @default(false)
+
+    @@index([user, archived, createdAt(sort: Desc)])
 }

@@ -9,14 +9,14 @@ export default function Projects({ projects }) {
 
   if (session) {
     return (
-      <>
+      <div className="container mx-auto px-5 py-24">
         <h1 className="text-center text-3xl font-medium text-slate-600">
           {session.user.name}
           &apos;s Projects
         </h1>
         {
           projects.length === 0 && (
-            <div className="mx-auto p-5 w-6/12 card bg-base-100 shadow-md rounded-lg border">
+            <div className="mx-auto p-5 my-10 w-6/12 card bg-base-100 shadow-md rounded-lg border">
               <div className="card-body items-center text-center">
                 <i className="bi bi-folder-plus text-9xl text-gray-600" />
                 <h2 className="card-title text-2xl">No Projects</h2>
@@ -35,7 +35,7 @@ export default function Projects({ projects }) {
         }
         {
           projects.length > 0 && (
-            <div className="grid justify-center md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-5 my-10">
+            <div className="grid justify-center md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-10 my-10">
               <Link href="/projects/new" passHref>
                 <div className="w-96 card bg-white shadow-md hover:shadow-lg hover:bg-gray-100 cursor-pointer rounded-lg border">
                   <div className="card-body items-center text-center justify-center">
@@ -48,7 +48,7 @@ export default function Projects({ projects }) {
               {projects.map((project) => (
                 <Link key={project.slug} href={`/projects/${project.slug}`} passHref>
                   <div className="w-96 card bg-white shadow-md hover:shadow-lg hover:bg-gray-100 cursor-pointer rounded-lg border group">
-                    <figure>
+                    <figure style={{ contain: 'content' }}>
                       <Image className="group-hover:brightness-90" width={400} height={225} src={project.image_thumbnail} alt={`Project thumbnail for ${project.name}`} />
                     </figure>
                     <div className="card-body">
@@ -62,7 +62,7 @@ export default function Projects({ projects }) {
             </div>
           )
         }
-      </>
+      </div>
     );
   }
 }
@@ -80,6 +80,7 @@ export async function getServerSideProps(context) {
   const projects = await prisma.projects.findMany({
     where: {
       user: session.user.name,
+      archived: false,
     },
     orderBy: {
       createdAt: 'desc',

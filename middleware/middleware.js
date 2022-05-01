@@ -1,19 +1,20 @@
-import nextConnect from 'next-connect';
+import { buildError, errors } from '@/constants/errors';
 import multiparty from 'multiparty';
+import nextConnect from 'next-connect';
 
 const middleware = nextConnect();
 
 middleware.use(async (req, res, next) => {
+  // Middleware only applies to creating new projects
+  if (req.method !== 'POST') {
+    return next();
+  }
+
   const form = new multiparty.Form();
 
-  await form.parse(req, (err, fields, files) => {
+  return form.parse(req, (err, fields, files) => {
     if (err) {
-      return res.status(err.status).json({
-        error: {
-          code: err.status,
-          message: 'Failed to save project, please try again.',
-        },
-      });
+      return buildError(res, errors.PROJECTS_GENERIC_SAVE_ERROR, { code: err.status });
     }
 
     // Unpack data
@@ -23,20 +24,10 @@ middleware.use(async (req, res, next) => {
 
     // Validate
     if (!['image/png', 'image/jpeg'].includes(req.file.headers['content-type'])) {
-      return res.status(400).json({
-        error: {
-          code: 400,
-          message: 'File is not of type PNG, JPG, or JPEG, please select a valid file.'
-        },
-      });
+      return buildError(res, errors.PROJECTS_THUMBNAIL_TYPE_ERROR);
     }
     if (req.file.size > 3000000) {
-      return res.status(400).json({
-        error: {
-          code: 400,
-          message: 'File size > 3MB, please select a smaller file.',
-        },
-      });
+      return buildError(res, errors.PROJECTS_THUMBNAIL_SIZE_ERROR);
     }
     // Validation passes, proceed to API
     return next();

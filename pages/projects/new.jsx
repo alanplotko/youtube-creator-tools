@@ -21,14 +21,15 @@ function handleSlugify(e) {
 
 export default function ProjectForm() {
   const { data: session } = useSession();
-  const [state, setState] = useState({
+  const defaultState = {
     override: false,
     isLoading: false,
     error: null,
     uploadValid: null,
     uploadResultMessage: 'Attach a file',
     uploadFileName: null,
-  });
+  };
+  const [state, setState] = useState(defaultState);
   const handleOverrideSlug = (e) => {
     e.preventDefault();
     if (state.override) {
@@ -77,31 +78,29 @@ export default function ProjectForm() {
 
     const project = new FormData(document.querySelector('form#createProject'));
     // Use axios to submit the form
-    await axios.post('/api/projects', project)
-      .then((result) => {
-        setState({
-          ...state,
-          isLoading: false,
-          error: null,
-          success: true,
-          projectLink: `/projects/${result.data.project.slug}`,
-          projectName: result.data.project.name,
-        });
-        document.querySelector('form#createProject').reset();
-      }).catch((err) => {
-        const error = err?.response?.data?.error;
-        setState({
-          ...state,
-          isLoading: false,
-          success: null,
-          error: error ? `${error.code} Error: ${error.message}` : err.message,
-        });
+    try {
+      const response = await axios.post('/api/projects', project);
+      setState({
+        ...defaultState,
+        success: true,
+        projectLink: `/projects/${response.data.project.slug}`,
+        projectName: response.data.project.name,
       });
+      document.querySelector('form#createProject').reset();
+    } catch (err) {
+      const error = err?.response?.data?.error;
+      setState({
+        ...state,
+        isLoading: false,
+        success: null,
+        error: error ? `${error.code} Error: ${error.message}` : err.message,
+      });
+    }
   };
 
   if (session) {
     return (
-      <div className="container mx-auto max-w-5xl mt-20">
+      <div className="container mx-auto max-w-5xl px-5 py-24">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
             <div className="px-4 sm:px-0">

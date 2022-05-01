@@ -1,4 +1,4 @@
-import '../styles/globals.css';
+import '@/styles/globals.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import Layout from '@/components/layout';
 import { SessionProvider } from 'next-auth/react';

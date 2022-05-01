@@ -1,5 +1,6 @@
+import { buildError, errors } from '@/constants/errors';
+import { Prisma } from '@prisma/client';
 import { v2 as cloudinary } from 'cloudinary';
-import errors from '@/constants/errors';
 import { getSession } from 'next-auth/react';
 import middleware from '@/middleware/middleware';
 import nextConnect from 'next-connect';
@@ -22,60 +23,76 @@ async function uploadThumbnail(file, id) {
 
 async function createProject(req, res) {
   const session = await getSession({ req });
+
+  // Signed in
   if (session) {
-    // Signed in
+    // Upload thumbnail
     const project = req.body;
-    const uploadResult = await uploadThumbnail(req.file, `${session.user.name}/${project.slug}`);
-    if (uploadResult.error) {
-      return res.status(500).json({
-        error: {
-          code: 500,
-          error: 'Thumbnail upload failed, please try again.',
-        },
-      });
+    const response = await uploadThumbnail(req.file, `${session.user.name}/${project.slug}`);
+    if (response.error) {
+      return buildError(res, errors.CLOUDINARY_UPLOAD_ERROR, { message: response.error?.message });
     }
-    project.image_thumbnail = uploadResult.eager[0].secure_url;
-    project.image_cover = uploadResult.eager[1].secure_url;
+
+    // Extract thumbnail URLs from upload response, username from session
+    project.image_thumbnail = response.eager[0].secure_url;
+    project.image_cover = response.eager[1].secure_url;
     project.user = session.user.name;
 
-    const result = await prisma.projects
-      .create({ data: project })
-      .then(() => res.status(200).json({
+    // Save project to projects schema
+    try {
+      await prisma.projects.create({ data: project });
+      return res.status(200).json({
         project,
         message: 'Successfully saved project.',
-      }))
-      .catch((err) => {
-        if (err && err.code === 'P2002') {
-          return res.status(400).json({
-            error: {
-              code: 400,
-              message: 'Slug already exists, please choose a different title or override the slug.',
-            },
-          });
-        }
-        return res.status(500).json(errors.PROJECT_GENERIC_ERROR);
       });
-    return result;
+    } catch (e) {
+      // Slug already exists
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        return buildError(res, errors.PROJECTS_SLUG_EXISTS_ERROR);
+      }
+      // Catch all other errors
+      return buildError(res, errors.PROJECTS_GENERIC_SAVE_ERROR, { message: e?.message });
+    }
   }
+
   // Not signed in
-  return res.status(401).json({
-    error: {
-      code: 401,
-      message: 'Unauthorized, user not signed in.',
-    },
-  });
+  return buildError(res, errors.UNAUTHORIZED);
 }
 
-handler.post(async (req, res) => {
+async function archiveProject(req, res) {
+  const session = await getSession({ req });
+
+  // Signed in
+  if (session) {
+    // Update archive flag to true
+    const { slug } = req.query;
+    try {
+      await prisma.projects.update({
+        where: { slug },
+        data: { archived: true },
+      });
+      return res.status(200).json({
+        slug,
+        message: 'Successfully archived project.',
+      });
+    } catch (e) {
+      // Catch all errors
+      return buildError(res, errors.PROJECTS_GENERIC_ARCHIVE_ERROR, { message: e?.message });
+    }
+  }
+
+  // Not signed in
+  return buildError(res, errors.UNAUTHORIZED);
+}
+
+handler.all(async (req, res) => {
   switch (req.method) {
     case 'POST':
-      try {
-        return await createProject(req, res);
-      } catch (err) {
-        return res.status(500).json();
-      }
+      return createProject(req, res);
+    case 'DELETE':
+      return archiveProject(req, res);
     default:
-      return res.status(405).json(errors.INVALID_METHOD(req.method));
+      return buildError(res, errors.INVALID_METHOD, { method: req.method });
   }
 });
 
