@@ -31,13 +31,18 @@ export const errors = {
     code: 401,
     message: 'Unauthorized, user not signed in.',
   },
-  YOUTUBE_API_GENERIC_ERROR: {
-    code: 500,
-    message: 'Failed to contact YouTube API, please try again.',
-  },
+  USER_STATS_GENERIC_ERROR: ({ code, message }) => ({
+    code: code ?? 500,
+    message: message ?? 'Failed to fetch stats.',
+  }),
+  YOUTUBE_API_GENERIC_ERROR: ({ code, message, serviceMessage }) => ({
+    code: code ?? 500,
+    message: message ?? 'Encountered error from YouTube API services, please try again.',
+    serviceMessage: serviceMessage ?? null,
+  }),
 };
 
 export const buildError = (res, error, args) => {
-  const json = typeof error === 'function' ? error(args) : error;
+  const json = typeof error === 'function' ? error(args ?? {}) : error;
   return res.status(json.code).json({ error: json });
 };

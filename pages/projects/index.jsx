@@ -77,19 +77,22 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const projects = await prisma.projects.findMany({
-    where: {
-      user: session.user.name,
-      archived: false,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  const projects = await prisma.projects
+    .findMany({
+      where: {
+        user: session.user.name,
+        archived: false,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
+    .then((response) => JSON.parse(JSON.stringify(response)));
+
   return {
     props: {
       session,
-      projects: JSON.parse(JSON.stringify(projects)),
+      projects,
     },
   };
 }

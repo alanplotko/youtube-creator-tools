@@ -67,3 +67,21 @@ model Projects {
 
     @@index([user, archived, createdAt(sort: Desc)])
 }
+
+model ChannelStats {
+    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
+    user                    String   @unique
+    title                   String
+    description             String
+    publishedAt             DateTime
+    subscriberCount         Int
+    videoCount              Int
+    views                   Int
+    estimatedMinutesWatched Int
+    comments                Int
+    likes                   Int
+    dislikes                Int
+    shares                  Int
+}

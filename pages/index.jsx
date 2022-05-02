@@ -1,3 +1,4 @@
+import ChannelStats from '@/components/ChannelStats';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 
@@ -36,6 +37,7 @@ export default function Login() {
           {isLoading && <div className="w-1/2 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
         </div>
       </div>
+      {isAuthenticated && <ChannelStats className="mt-10" user={session.user.name} />}
     </div>
   );
 }
