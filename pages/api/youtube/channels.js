@@ -1,22 +1,23 @@
 import { buildError, errors } from '@/constants/errors';
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
+import { getToken } from 'next-auth/jwt';
 import qs from 'qs';
 
+const secret = process.env.NEXTAUTH_SECRET;
 const CHANNELS = 'https://youtube.googleapis.com/youtube/v3/channels';
 
 export default async function handler(req, res) {
-  const session = await getSession({ req });
-  const { user } = req.query;
-  const accessToken = session?.accessToken ?? req.query.accessToken;
+  const token = (await getToken({ req, secret }))?.accessToken ?? req?.query?.accessToken;
 
   // Signed in
-  if (accessToken) {
+  if (token) {
+    const { user } = req.query;
+
     try {
       // Get general channel information
       const response = await axios.get(CHANNELS, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         params: {
           part: ['snippet', 'contentDetails', 'statistics'],

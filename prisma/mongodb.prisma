@@ -53,7 +53,31 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-model Projects {
+model Video {
+    id              String          @id @default(auto()) @map("_id") @db.ObjectId
+    user            String
+    videoId         String
+    title           String
+    description     String
+    publishedAt     DateTime
+    image_thumbnail String
+    projectIDs      String[]        @db.ObjectId
+    project         Project[]       @relation(fields: [projectIDs], references: [id])
+    searchIDs       String[]        @db.ObjectId
+    search          VideoSearch[]   @relation(fields: [searchIDs], references: [id])
+}
+
+model VideoSearch {
+    id              String   @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    user            String
+    query           String   @unique
+    videoIDs        String[] @db.ObjectId
+    videos          Video[]  @relation(fields: [videoIDs], references: [id])
+}
+
+model Project {
     id              String   @id @default(auto()) @map("_id") @db.ObjectId
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
@@ -63,7 +87,9 @@ model Projects {
     image_thumbnail String
     image_cover     String
     user            String
-    archived        Boolean @default(false)
+    archived        Boolean  @default(false)
+    videoIDs        String[] @db.ObjectId
+    videos          Video[]  @relation(fields: [videoIDs], references: [id])
 
     @@index([user, archived, createdAt(sort: Desc)])
 }

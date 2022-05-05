@@ -4,12 +4,12 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-client-js"
+    provider        = "prisma-client-js"
     previewFeatures = ["extendedIndexes"]
 }
 
 model Account {
-    id                String  @id @default(cuid())
+    id                String    @id @default(cuid())
     userId            String
     type              String
     provider          String
@@ -21,8 +21,7 @@ model Account {
     scope             String?
     id_token          String?
     session_state     String?
-
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
 }
@@ -53,7 +52,28 @@ model VerificationToken {
     @@unique([identifier, token])
 }
 
-model Projects {
+model Video {
+    id              String          @id @default(cuid())
+    user            String
+    videoId         String
+    title           String
+    description     String
+    publishedAt     DateTime
+    image_thumbnail String
+    project         Project[]
+    search          VideoSearch[]
+}
+
+model VideoSearch {
+    id              String   @id @default(cuid())
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    user            String
+    query           String   @unique
+    videos          Video[]
+}
+
+model Project {
     id              String   @id @default(cuid())
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
@@ -63,7 +83,8 @@ model Projects {
     image_thumbnail String
     image_cover     String
     user            String
-    archived        Boolean @default(false)
+    archived        Boolean  @default(false)
+    videos          Video[]
 
     @@index([user, archived, createdAt(sort: Desc)])
 }

@@ -1,7 +1,6 @@
 import useSWR, { mutate } from 'swr';
 import axios from 'axios';
 import moment from 'moment';
-import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 
 const fetcher = (params) => axios.get(params.url, { params }).then((res) => res.data);
@@ -57,9 +56,8 @@ const secondaryStats = [
 ];
 
 export default function ChannelStats({ className, user }) {
-  const { data: session } = useSession();
   const swrKey = {
-    url: '/api/channel/stats', user, accessToken: session.accessToken, forceRefresh: false,
+    url: '/api/channel/stats', user, forceRefresh: false,
   };
   const { data, isLoading, isError } = useStats(swrKey);
   const [state, setState] = useState({ isRefreshing: false });
@@ -68,7 +66,7 @@ export default function ChannelStats({ className, user }) {
     setState({ isRefreshing: true });
     await axios
       .get('/api/channel/stats', {
-        params: { user, accessToken: session.accessToken, forceRefresh: true },
+        params: { user, forceRefresh: true },
       })
       .then((res) => res.data)
       .then((stats) => mutate(swrKey, stats))

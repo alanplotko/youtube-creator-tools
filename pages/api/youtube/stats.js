@@ -1,20 +1,21 @@
 import { buildError, errors } from '@/constants/errors';
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
+import { getToken } from 'next-auth/jwt';
 import moment from 'moment';
 import qs from 'qs';
 
+const secret = process.env.NEXTAUTH_SECRET;
 const ANALYTICS = 'https://youtubeanalytics.googleapis.com/v2/reports';
 const dateFormat = 'YYYY-MM-DD';
 
 export default async function handler(req, res) {
-  const session = await getSession({ req });
-  const accessToken = session?.accessToken ?? req.query.accessToken;
+  const token = (await getToken({ req, secret }))?.accessToken ?? req?.query?.accessToken;
 
   // Signed in
-  if (accessToken) {
+  if (token) {
     // Get start date for channel
     const { fromDate } = req.query;
+
     // Generate bounds for lifetime stats
     const startDate = moment(fromDate).format(dateFormat);
     const endDate = moment().format(dateFormat);
@@ -23,7 +24,7 @@ export default async function handler(req, res) {
       // Get general channel information
       const response = await axios.get(ANALYTICS, {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${token}`,
         },
         params: {
           startDate,

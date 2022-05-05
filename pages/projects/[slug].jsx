@@ -1,4 +1,5 @@
 import { getSession, useSession } from 'next-auth/react';
+import Link from 'next/link';
 import axios from 'axios';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
@@ -24,7 +25,7 @@ export default function ProjectView({ project }) {
   if (session) {
     return (
       <>
-        <div className="w-full bg-cover bg-center h-96 relative" style={{ backgroundImage: `url(${project.image_cover})` }}>
+        <div className="w-full bg-cover bg-center h-80 relative" style={{ backgroundImage: `url(${project.image_cover})` }}>
           <h1 className="absolute left-10 bottom-10 text-center text-6xl font-medium text-white bg-black p-2">
             {project.name}
           </h1>
@@ -43,6 +44,9 @@ export default function ProjectView({ project }) {
             <p className="lg:w-1/2 w-full leading-relaxed text-gray-600">{project.description}</p>
             <div className="mt-10 h-0.5 w-full bg-secondary rounded opacity-25" />
             <div className="container mt-5">
+              <h1 className="float-left text-3xl font-medium text-slate-600">
+                Videos
+              </h1>
               <label htmlFor="project" className="btn btn-primary modal-button float-right">Archive Project</label>
               <input type="checkbox" id="project" className="modal-toggle" />
               <label htmlFor="project" className="modal cursor-pointer">
@@ -89,6 +93,25 @@ export default function ProjectView({ project }) {
               </label>
             </div>
           </div>
+          {
+            [].length === 0 && (
+              <div className="mx-auto w-8/12 card bg-base-100 shadow-md rounded-lg border">
+                <div className="card-body items-center text-center">
+                  <i className="bi bi-youtube text-9xl text-gray-600" />
+                  <h2 className="card-title text-2xl">No Videos</h2>
+                  <p className="text-lg">Get started by adding videos.</p>
+                  <div className="text-center mt-8">
+                    <Link href={`/projects/${project.slug}/videos/add`} passHref>
+                      <button className="btn btn-primary gap-2 text-lg" type="button">
+                        Add Videos
+                        <i className="bi bi-arrow-right" />
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )
+          }
         </div>
       </>
     );
@@ -106,7 +129,7 @@ export async function getServerSideProps(context) {
     };
   }
   const { slug } = context.params;
-  const project = await prisma.projects.findUnique({ where: { slug } });
+  const project = await prisma.project.findUnique({ where: { slug } });
   if (project == null || project.archived) {
     return {
       redirect: {

@@ -77,7 +77,7 @@ export async function getServerSideProps(context) {
       },
     };
   }
-  const projects = await prisma.projects
+  const projects = await prisma.project
     .findMany({
       where: {
         user: session.user.name,
