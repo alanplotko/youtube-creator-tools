@@ -84,6 +84,7 @@ model Project {
     image_cover     String
     user            String
     archived        Boolean  @default(false)
+    published       Boolean  @default(false)
     videos          Video[]
 
     @@index([user, archived, createdAt(sort: Desc)])

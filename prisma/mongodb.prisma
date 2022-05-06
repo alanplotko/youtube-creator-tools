@@ -88,6 +88,7 @@ model Project {
     image_cover     String
     user            String
     archived        Boolean  @default(false)
+    published       Boolean  @default(false)
     videoIDs        String[] @db.ObjectId
     videos          Video[]  @relation(fields: [videoIDs], references: [id])
 

@@ -130,7 +130,7 @@ export async function getServerSideProps(context) {
   }
   const { slug } = context.params;
   const project = await prisma.project.findUnique({ where: { slug } });
-  if (project == null || project.archived) {
+  if (project == null || project.archived || !project.published) {
     return {
       redirect: {
         destination: '/projects',

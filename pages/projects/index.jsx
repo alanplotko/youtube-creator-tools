@@ -46,14 +46,33 @@ export default function Projects({ projects }) {
                 </div>
               </Link>
               {projects.map((project) => (
-                <Link key={project.slug} href={`/projects/${project.slug}`} passHref>
+                <Link
+                  key={project.slug}
+                  href={{
+                    pathname: `/projects/${project.published ? project.slug : 'new'}`,
+                    query: { slug: project.slug },
+                  }}
+                  passHref
+                >
                   <div className="w-96 card bg-white shadow-md hover:shadow-lg hover:bg-gray-100 cursor-pointer rounded-lg border group">
                     <figure style={{ contain: 'content' }}>
-                      <Image className="group-hover:brightness-90" width={400} height={225} src={project.image_thumbnail} alt={`Project thumbnail for ${project.name}`} />
+                      <Image className={`${project.published ? 'group-hover:brightness-90' : 'brightness-50'} relative`} width={400} height={225} src={project.image_thumbnail} alt={`Project thumbnail for ${project.name}`} />
+                      {!project.published && (
+                        <p className="absolute font-extrabold text-8xl text-white text-opacity-75">DRAFT</p>
+                      )}
                     </figure>
                     <div className="card-body">
-                      <p className="text-sm uppercase font-bold">{moment(project.createdAt).fromNow()}</p>
-                      <h2 className="card-title text-2xl">{project.name}</h2>
+                      <p className="text-sm uppercase font-bold">
+                        Last updated
+                        {' '}
+                        {moment(project.updatedAt).fromNow()}
+                      </p>
+                      <h2 className="card-title text-2xl">
+                        {!project.published && (
+                          <i className="bi bi-pencil" />
+                        )}
+                        {project.name}
+                      </h2>
                       <p className="text-lg line-clamp-2">{project.description}</p>
                     </div>
                   </div>
@@ -83,9 +102,10 @@ export async function getServerSideProps(context) {
         user: session.user.name,
         archived: false,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: [
+        { published: 'asc' },
+        { updatedAt: 'desc' },
+      ],
     })
     .then((response) => JSON.parse(JSON.stringify(response)));
 

@@ -12,9 +12,8 @@ export default async function handler(req, res) {
 
   // Signed in
   if (accessToken) {
-    // Get start date for channel
-    const { query } = req.query;
     const user = name;
+    const { query } = req.query;
 
     const videoSearch = await prisma.VideoSearch.findFirst({
       where: { user, query },
