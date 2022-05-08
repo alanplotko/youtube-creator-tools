@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import axios from 'axios';
+import { shortenString } from '@/lib/macros';
 import { useState } from 'react';
 
 function toSlug(s) {
@@ -55,10 +56,7 @@ export default function CreateProjectStage1() {
     } else {
       uploadValid = true;
       uploadResultMessage = 'File selected!';
-      uploadFileName = input.files[0].name;
-      if (uploadFileName.length > 20) {
-        uploadFileName = `${uploadFileName.substr(0, 10)}...${uploadFileName.substr(-8)}`;
-      }
+      uploadFileName = shortenString(input.files[0].name, 20);
     }
     setState({
       ...state,
@@ -75,14 +73,16 @@ export default function CreateProjectStage1() {
     });
 
     const project = new FormData(document.querySelector('form#createProject'));
+
     // Use axios to submit the form
     try {
-      const response = await axios.post('/api/projects', project);
+      const uploadResponse = await axios.post('/api/projects/upload', project);
+      const saveResponse = await axios.post('/api/projects', uploadResponse.data.project);
       setState({
         ...defaultState,
         success: true,
-        projectSlug: response.data.project.slug,
-        projectName: response.data.project.name,
+        projectSlug: saveResponse.data.project.slug,
+        projectName: saveResponse.data.project.name,
       });
       document.querySelector('form#createProject').reset();
     } catch (err) {

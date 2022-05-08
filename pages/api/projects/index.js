@@ -1,40 +1,12 @@
 import { buildError, errors } from '@/constants/errors';
 import { Prisma } from '@prisma/client';
-import { v2 as cloudinary } from 'cloudinary';
 import { getToken } from 'next-auth/jwt';
-import middleware from '@/middleware/middleware';
-import nextConnect from 'next-connect';
 import prisma from '@/lib/prisma';
 
 const secret = process.env.NEXTAUTH_SECRET;
 
-const handler = nextConnect();
-handler.use(middleware);
-
-async function uploadThumbnail(file, id) {
-  return cloudinary.uploader.upload(file.path, {
-    public_id: id,
-    upload_preset: 'project-thumbnail',
-  }, (error, result) => {
-    if (error) {
-      return error;
-    }
-    return result;
-  });
-}
-
-async function createProject(req, res, user) {
-  // Upload thumbnail
+async function createProject(req, res) {
   const project = req.body;
-  const response = await uploadThumbnail(req.file, `${user}/${project.slug}`);
-  if (response.error) {
-    return buildError(res, errors.CLOUDINARY_UPLOAD_ERROR, { message: response.error?.message });
-  }
-
-  // Extract thumbnail URLs from upload response, username from session
-  project.image_thumbnail = response.eager[0].secure_url;
-  project.image_cover = response.eager[1].secure_url;
-  project.user = user;
 
   // Save project to projects schema
   try {
@@ -50,6 +22,31 @@ async function createProject(req, res, user) {
     }
     // Catch all other errors
     return buildError(res, errors.PROJECTS_GENERIC_SAVE_ERROR, { message: e?.message });
+  }
+}
+
+async function updateProject(req, res) {
+  const { selections, slug } = req.body;
+  if (selections.length === 0) {
+    return buildError(res, errors.PROJECTS_NO_SELECTION_ERROR);
+  }
+  try {
+    const result = await prisma.project.update({
+      where: { slug },
+      data: {
+        published: true,
+        videos: {
+          connect: selections,
+        },
+      },
+    });
+    return res.status(200).json({
+      data: result,
+      message: `Successfully added ${selections.length} videos to project.`,
+    });
+  } catch (e) {
+    // Catch all errors
+    return buildError(res, errors.PROJECTS_GENERIC_UPDATE_ERROR, { message: e?.message });
   }
 }
 
@@ -71,14 +68,16 @@ async function archiveProject(req, res) {
   }
 }
 
-handler.all(async (req, res) => {
+export default async function handler(req, res) {
   const session = await getToken({ req, secret });
 
   // Signed in
   if (session) {
     switch (req.method) {
       case 'POST':
-        return createProject(req, res, session.user.name);
+        return createProject(req, res);
+      case 'PUT':
+        return updateProject(req, res);
       case 'DELETE':
         return archiveProject(req, res);
       default:
@@ -88,12 +87,4 @@ handler.all(async (req, res) => {
 
   // Not signed in
   return buildError(res, errors.UNAUTHORIZED);
-});
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export default handler;
+}

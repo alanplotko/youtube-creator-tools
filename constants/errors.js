@@ -15,6 +15,14 @@ export const errors = {
     code: code ?? 500,
     message: message ?? 'Failed to archive project, please try again.',
   }),
+  PROJECTS_GENERIC_UPDATE_ERROR: ({ code, message }) => ({
+    code: code ?? 500,
+    message: message ?? 'Failed to update project, please try again.',
+  }),
+  PROJECTS_NO_SELECTION_ERROR: {
+    code: 400,
+    message: 'No videos selected, please choose at least 1 video.',
+  },
   PROJECTS_THUMBNAIL_TYPE_ERROR: {
     code: 400,
     message: 'File is not of type PNG, JPG, or JPEG, please select a valid file.',

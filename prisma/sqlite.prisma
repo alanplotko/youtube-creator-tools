@@ -55,7 +55,7 @@ model VerificationToken {
 model Video {
     id              String          @id @default(cuid())
     user            String
-    videoId         String
+    videoId         String          @unique
     title           String
     description     String
     publishedAt     DateTime

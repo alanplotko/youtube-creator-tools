@@ -1,4 +1,6 @@
 import { getSession, useSession } from 'next-auth/react';
+import { shortenString, truncateString } from '@/lib/macros';
+import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
 import moment from 'moment';
@@ -30,8 +32,8 @@ export default function ProjectView({ project }) {
             {project.name}
           </h1>
         </div>
-        <div className="container mx-auto max-w-5xl mt-20">
-          <div className="flex flex-wrap w-full mb-20">
+        <div className="container mx-auto mt-20">
+          <div className="flex flex-wrap w-full mb-10">
             <div className="lg:w-1/2 w-full mb-6 lg:mb-0">
               <h1 className="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{project.name}</h1>
               <div className="h-1 w-60 bg-primary rounded" />
@@ -93,25 +95,42 @@ export default function ProjectView({ project }) {
               </label>
             </div>
           </div>
-          {
-            [].length === 0 && (
-              <div className="mx-auto w-8/12 card bg-base-100 shadow-md rounded-lg border">
-                <div className="card-body items-center text-center">
-                  <i className="bi bi-youtube text-9xl text-gray-600" />
-                  <h2 className="card-title text-2xl">No Videos</h2>
-                  <p className="text-lg">Get started by adding videos.</p>
-                  <div className="text-center mt-8">
-                    <Link href={`/projects/${project.slug}/videos/add`} passHref>
-                      <button className="btn btn-primary gap-2 text-lg" type="button">
-                        Add Videos
-                        <i className="bi bi-arrow-right" />
-                      </button>
-                    </Link>
-                  </div>
+          {project.videos.length === 0 && (
+            <div className="mx-auto w-8/12 card bg-base-100 shadow-md rounded-lg border">
+              <div className="card-body items-center text-center">
+                <i className="bi bi-youtube text-9xl text-gray-600" />
+                <h2 className="card-title text-2xl">No Videos</h2>
+                <p className="text-lg">Get started by adding videos.</p>
+                <div className="text-center mt-8">
+                  <Link href={`/projects/${project.slug}/videos/add`} passHref>
+                    <button className="btn btn-primary gap-2 text-lg" type="button">
+                      Add Videos
+                      <i className="bi bi-arrow-right" />
+                    </button>
+                  </Link>
                 </div>
               </div>
-            )
-          }
+            </div>
+          )}
+          {project.videos.length > 0 && (
+            <section className="text-gray-600 body-font grid md:grid-cols-3 lg:grid-cols-4 gap-4 pb-40">
+              {project.videos.map((video) => (
+                <Link key={video.videoId} href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
+                  <a target="_blank">
+                    <div className="flex relative">
+                      <h2 className="absolute z-10 text-xl font-bold text-white w-full bg-black p-3 bg-opacity-50">{truncateString(video.title)}</h2>
+                      <Image className="absolute inset-0 w-full h-full object-cover object-center" layout="fill" src={video.image_thumbnail} alt="Video thumbnail" />
+                      <div className="px-8 py-10 relative z-10 w-full border-4 border-gray-200 bg-white opacity-0 hover:opacity-100">
+                        <h2 className="tracking-widest text-sm title-font font-medium text-indigo-500 mb-1">{moment(video.publishedAt).fromNow()}</h2>
+                        <h1 className="title-font text-lg font-medium text-gray-900 mb-3">{video.title}</h1>
+                        <p className="leading-relaxed">{video.description ? shortenString(video.description) : 'No description'}</p>
+                      </div>
+                    </div>
+                  </a>
+                </Link>
+              ))}
+            </section>
+          )}
         </div>
       </>
     );
@@ -129,7 +148,7 @@ export async function getServerSideProps(context) {
     };
   }
   const { slug } = context.params;
-  const project = await prisma.project.findUnique({ where: { slug } });
+  const project = await prisma.project.findUnique({ where: { slug }, include: { videos: true } });
   if (project == null || project.archived || !project.published) {
     return {
       redirect: {

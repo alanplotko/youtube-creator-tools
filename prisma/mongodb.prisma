@@ -56,7 +56,7 @@ model VerificationToken {
 model Video {
     id              String          @id @default(auto()) @map("_id") @db.ObjectId
     user            String
-    videoId         String
+    videoId         String          @unique
     title           String
     description     String
     publishedAt     DateTime

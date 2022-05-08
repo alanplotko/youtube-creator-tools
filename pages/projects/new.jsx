@@ -2,9 +2,39 @@ import { getSession, useSession } from 'next-auth/react';
 import CreateProjectStage1 from '@/components/CreateProjectStage1';
 import CreateProjectStage2 from '@/components/CreateProjectStage2';
 import prisma from '@/lib/prisma';
+import { useState } from 'react';
 
 export default function ProjectForm({ project }) {
   const { data: session } = useSession();
+  const [state, setState] = useState({ published: false });
+
+  const onPublishHandler = () => {
+    setState({ published: true });
+  };
+
+  const steps = [];
+  // Step 1: Basic Details
+  if (!project) {
+    steps.push(
+      <li key="step1" className="step step-primary">Basic Details</li>,
+      <li key="step2" className="step">Add Videos</li>,
+      <li key="step3" className="step">Done!</li>,
+    );
+  // Step 2: Add Videos
+  } else if (project && !state.published) {
+    steps.push(
+      <li key="step1" className="step" data-content="✓">Basic Details</li>,
+      <li key="step2" className="step step-primary">Add Videos</li>,
+      <li key="step3" className="step">Done!</li>,
+    );
+  // Step 3: Done!
+  } else {
+    steps.push(
+      <li key="step1" className="step" data-content="✓">Basic Details</li>,
+      <li key="step2" className="step" data-content="✓">Add Videos</li>,
+      <li key="step3" className="step step-primary" data-content="✓">Done!</li>,
+    );
+  }
 
   if (session) {
     return (
@@ -19,14 +49,17 @@ export default function ProjectForm({ project }) {
                 so that you can locate this project later.
               </p>
               <ul className="steps steps-vertical">
-                <li className={`step ${!project && 'step-primary'}`}>Basic Details</li>
-                <li className={`step ${project && 'step-primary'}`}>Add Videos</li>
+                {steps}
               </ul>
             </div>
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
             <div className="shadow sm:rounded-md sm:overflow-hidden">
-              {project ? (<CreateProjectStage2 />) : (<CreateProjectStage1 />)}
+              {project ? (
+                <CreateProjectStage2 project={project} completeCallback={onPublishHandler} />
+              ) : (
+                <CreateProjectStage1 />
+              )}
             </div>
           </div>
         </div>

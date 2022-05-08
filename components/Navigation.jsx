@@ -13,6 +13,7 @@ export default function Navigation() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const isLoading = status === 'loading';
+
   return (
     <div className="navbar bg-base-100 backdrop-blur-md shadow-md h-20">
       <div className="container mx-auto">
@@ -24,17 +25,19 @@ export default function Navigation() {
             </a>
           </Link>
         </div>
-        <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal p-0 text-lg">
-            {navigation.map((link) => (
-              <Link key={link.name} href={link.path} passHref>
-                <li>
-                  <a className={`${router.pathname === link.path ? 'font-semibold' : ''}`}>{link.name}</a>
-                </li>
-              </Link>
-            ))}
-          </ul>
-        </div>
+        {session && (
+          <div className="navbar-center hidden lg:flex">
+            <ul className="menu menu-horizontal p-0 text-lg">
+              {navigation.map((link) => (
+                <Link key={link.name} href={link.path} passHref>
+                  <li>
+                    <a className={`${router.pathname === link.path ? 'font-semibold' : ''}`}>{link.name}</a>
+                  </li>
+                </Link>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="navbar-end">
           {!isLoading && !session && (
             <div className="dropdown dropdown-end float-right">
