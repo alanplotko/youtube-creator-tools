@@ -55,7 +55,7 @@ const secondaryStats = [
   },
 ];
 
-export default function ChannelStats({ className, user }) {
+export default function ChannelStats({ user }) {
   const swrKey = {
     url: '/api/channel/stats', user, forceRefresh: false,
   };
@@ -75,7 +75,7 @@ export default function ChannelStats({ className, user }) {
 
   if (isError) {
     return (
-      <div className={className}>
+      <div>
         <h1 className="mb-5 text-3xl font-medium text-slate-600">Channel Stats</h1>
         <div className="w-1/3 alert alert-error shadow-lg">
           <div>
@@ -90,7 +90,7 @@ export default function ChannelStats({ className, user }) {
   }
 
   return (
-    <div className={className}>
+    <div>
       <h1 className="mb-5 text-3xl font-medium text-slate-600">Channel Stats</h1>
       {!isLoading && (
         <div className="w-1/3 mb-5 h-10 alert alert-info shadow-lg">

@@ -1,0 +1,10 @@
+.CardSide {
+    @apply bg-base-100;
+    @apply shadow;
+    @apply rounded-lg;
+}
+
+.Loading {
+    @apply bg-gray-200;
+    @apply animate-pulse;
+}
