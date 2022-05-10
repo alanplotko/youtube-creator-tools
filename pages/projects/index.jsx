@@ -38,7 +38,7 @@ export default function Projects({ projects }) {
                 key={project.slug}
                 href={{
                   pathname: `/projects/${project.published ? project.slug : 'new'}`,
-                  query: { slug: project.slug },
+                  query: !project.published ? { slug: project.slug } : null,
                 }}
                 passHref
               >

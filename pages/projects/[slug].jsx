@@ -90,7 +90,7 @@ export default function ProjectView({ project }) {
                         {state.archived && 'Archived'}
                       </div>
                     </label>
-                    <label htmlFor="project" className="btn">Cancel</label>
+                    <label htmlFor="project" className="btn" disabled={state.isArchiving || state.archived}>Cancel</label>
                   </div>
                 </label>
               </label>
