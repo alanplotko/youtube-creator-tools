@@ -16,6 +16,18 @@
     - https://developers.google.com/youtube/v3/docs/videos/update
     - https://developers.google.com/youtube/v3/docs/thumbnails/set
 
+
+Example update:
+
+{
+  "id": "",
+  "snippet": {
+    "categoryId": "20",
+    "tags": [],
+    "title": ""
+  }
+}
+
 ### B. Upload Flow
 
 WIP

@@ -1,6 +1,7 @@
 import { getSession, useSession } from 'next-auth/react';
 import CreateProjectStage1 from '@/components/CreateProjectStage1';
 import CreateProjectStage2 from '@/components/CreateProjectStage2';
+import Steps from '@/components/Steps';
 import prisma from '@/lib/prisma';
 import { useState } from 'react';
 
@@ -12,29 +13,12 @@ export default function ProjectForm({ project }) {
     setState({ published: true });
   };
 
-  const steps = [];
-  // Step 1: Basic Details
-  if (!project) {
-    steps.push(
-      <li key="step1" className="step step-primary">Basic Details</li>,
-      <li key="step2" className="step">Add Videos</li>,
-      <li key="step3" className="step">Done!</li>,
-    );
-  // Step 2: Add Videos
-  } else if (project && !state.published) {
-    steps.push(
-      <li key="step1" className="step" data-content="✓">Basic Details</li>,
-      <li key="step2" className="step step-primary">Add Videos</li>,
-      <li key="step3" className="step">Done!</li>,
-    );
-  // Step 3: Done!
-  } else {
-    steps.push(
-      <li key="step1" className="step" data-content="✓">Basic Details</li>,
-      <li key="step2" className="step" data-content="✓">Add Videos</li>,
-      <li key="step3" className="step step-primary" data-content="✓">Done!</li>,
-    );
-  }
+  const steps = ['Basic Details', 'Add Videos', 'Done!'];
+  const currentStepIndex = (() => {
+    if (!project) return 0;
+    if (project && !state.published) return 1;
+    return 2;
+  })();
 
   if (session) {
     return (
@@ -48,9 +32,7 @@ export default function ProjectForm({ project }) {
                 be working on in this session. Choose a descriptive name,
                 so that you can locate this project later.
               </p>
-              <ul className="steps steps-vertical">
-                {steps}
-              </ul>
+              <Steps steps={steps} currentStepIndex={currentStepIndex} />
             </div>
           </div>
           <div className="mt-5 md:mt-0 md:col-span-2">
