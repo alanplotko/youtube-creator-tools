@@ -6,7 +6,7 @@ export default function Home() {
   const { data: session, status } = useSession();
 
   return (
-    <div className="container mx-auto px-5 py-24">
+    <div className="main-container">
       <LoginCard status={status} session={session} />
       {session && (<ChannelStats user={session.user.name} />)}
     </div>

@@ -7,7 +7,7 @@ export default function Steps({ steps, currentStepIndex }) {
         <li
           key={step}
           className={classNames('step', index === currentStepIndex ? 'step-primary' : '')}
-          data-content={(currentStepIndex > index || currentStepIndex === index) ? '✓' : (index + 1)}
+          data-content={(currentStepIndex > index || currentStepIndex === steps.length - 1) ? '✓' : (index + 1)}
         >
           {step}
         </li>

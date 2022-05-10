@@ -26,3 +26,64 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.main-container {
+  @apply container;
+  @apply mx-auto;
+  @apply px-5;
+  @apply py-24;
+}
+
+.main-grid {
+  @apply md:grid;
+  @apply md:grid-cols-3;
+  @apply md:gap-6;
+  @apply justify-center;
+}
+
+.main-header {
+  @apply text-3xl;
+  @apply mb-5;
+  @apply font-medium;
+  @apply text-slate-600;
+}
+
+.main-section-header {
+  @apply text-lg;
+  @apply font-medium;
+  @apply leading-6;
+  @apply text-gray-900;
+}
+
+.main-section-description {
+  @apply mt-1;
+  @apply text-gray-600;
+}
+
+.main-card {
+  @apply card;
+  @apply bg-base-100;
+  @apply shadow-md;
+  @apply rounded-lg;
+  @apply border;
+}
+
+.main-card-side {
+  @apply main-card;
+  @apply card-side;
+}
+
+.main-hover-card {
+  @apply main-card;
+}
+
+.main-hover-card:hover {
+  @apply hover:shadow-lg;
+  @apply hover:bg-gray-100;
+  @apply cursor-pointer;
+}
+
+.main-loading-indicator {
+  @apply bg-gray-200;
+  @apply animate-pulse;
+}

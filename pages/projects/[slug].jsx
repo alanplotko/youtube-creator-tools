@@ -2,6 +2,7 @@ import { getSession, useSession } from 'next-auth/react';
 import { shortenString, truncateString } from '@/lib/macros';
 import Image from 'next/image';
 import Link from 'next/link';
+import NoDataCard from '@/components/NoDataCard';
 import axios from 'axios';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
@@ -96,21 +97,13 @@ export default function ProjectView({ project }) {
             </div>
           </div>
           {project.videos.length === 0 && (
-            <div className="mx-auto w-8/12 card bg-base-100 shadow-md rounded-lg border">
-              <div className="card-body items-center text-center">
-                <i className="bi bi-youtube text-9xl text-gray-600" />
-                <h2 className="card-title text-2xl">No Videos</h2>
-                <p className="text-lg">Get started by adding videos.</p>
-                <div className="text-center mt-8">
-                  <Link href={`/projects/${project.slug}/videos/add`} passHref>
-                    <button className="btn btn-primary gap-2 text-lg" type="button">
-                      Add Videos
-                      <i className="bi bi-arrow-right" />
-                    </button>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <NoDataCard
+              title="No Videos"
+              callToAction="Get started by adding videos."
+              link={`/projects/new?slug=${project.slug}`}
+              buttonText="Add Videos"
+              icon="bi-youtube"
+            />
           )}
           {project.videos.length > 0 && (
             <section className="text-gray-600 body-font grid md:grid-cols-3 lg:grid-cols-4 gap-4 pb-40">

@@ -1,6 +1,6 @@
 import { getSession, useSession } from 'next-auth/react';
-import CreateProjectStage1 from '@/components/CreateProjectStage1';
-import CreateProjectStage2 from '@/components/CreateProjectStage2';
+import CreateProjectStage1 from '@/components/CreateProjectStage/CreateProjectStage1';
+import CreateProjectStage2 from '@/components/CreateProjectStage/CreateProjectStage2';
 import Steps from '@/components/Steps';
 import prisma from '@/lib/prisma';
 import { useState } from 'react';
@@ -15,19 +15,23 @@ export default function ProjectForm({ project }) {
 
   const steps = ['Basic Details', 'Add Videos', 'Done!'];
   const currentStepIndex = (() => {
-    if (!project) return 0;
-    if (project && !state.published) return 1;
+    if (!project) {
+      return 0;
+    }
+    if (project && !state.published) {
+      return 1;
+    }
     return 2;
   })();
 
   if (session) {
     return (
-      <div className="container mx-auto px-5 py-24">
-        <div className="md:grid md:grid-cols-3 md:gap-6">
+      <div className="main-container">
+        <div className="main-grid">
           <div className="md:col-span-1">
             <div className="px-4 sm:px-0">
-              <h3 className="text-lg font-medium leading-6 text-gray-900">New Project Wizard</h3>
-              <p className="mt-1 text-md text-gray-600">
+              <h3 className="main-section-header">New Project Wizard</h3>
+              <p className="main-section-description">
                 Provide some basic information about the videos you&apos;ll
                 be working on in this session. Choose a descriptive name,
                 so that you can locate this project later.

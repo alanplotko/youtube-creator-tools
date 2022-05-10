@@ -76,7 +76,7 @@ export default function ChannelStats({ user }) {
   if (isError) {
     return (
       <div>
-        <h1 className="mb-5 text-3xl font-medium text-slate-600">Channel Stats</h1>
+        <h1 className="main-header">Channel Stats</h1>
         <div className="w-1/3 alert alert-error shadow-lg">
           <div>
             <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -91,7 +91,7 @@ export default function ChannelStats({ user }) {
 
   return (
     <div>
-      <h1 className="mb-5 text-3xl font-medium text-slate-600">Channel Stats</h1>
+      <h1 className="main-header">Channel Stats</h1>
       {!isLoading && (
         <div className="w-1/3 mb-5 h-10 alert alert-info shadow-lg">
           <div>
