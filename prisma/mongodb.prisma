@@ -112,3 +112,27 @@ model ChannelStats {
     dislikes                Int
     shares                  Int
 }
+
+model TopVideos {
+    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
+    user                    String   @unique
+    videos                  VideoStat[]
+}
+
+model VideoStat {
+    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+    videoId                 String      @unique
+    publishedAt             DateTime
+    title                   String
+    tags                    String
+    image_thumbnail         String
+    viewCount               Int
+    likeCount               Int
+    dislikeCount            Int
+    favoriteCount           Int
+    commentCount            Int
+    topVideos               TopVideos?   @relation(fields: [topVideosId], references: [id])
+    topVideosId             String?
+}
