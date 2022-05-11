@@ -1,0 +1,7 @@
+.roundedInput {
+    @apply rounded-l-lg !important;
+}
+
+.roundedButton {
+    @apply rounded-r-lg !important;
+}

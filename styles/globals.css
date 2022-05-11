@@ -87,3 +87,92 @@ a {
   @apply bg-gray-200;
   @apply animate-pulse;
 }
+
+.main-label {
+  @apply block;
+  @apply font-medium;
+  @apply text-gray-700;
+}
+
+.main-input {
+  @apply w-full;
+  @apply h-12;
+  @apply px-4;
+  @apply mb-2;
+  @apply text-lg;
+  @apply text-gray-700;
+  @apply placeholder-gray-600;
+  @apply border;
+  @apply shadow-sm;
+  @apply rounded-lg;
+}
+
+.main-textarea {
+  @apply w-full;
+  @apply h-32;
+  @apply px-3;
+  @apply py-2;
+  @apply text-lg;
+  @apply text-gray-700;
+  @apply placeholder-gray-600;
+  @apply border;
+  @apply rounded-lg;
+  @apply shadow-sm;
+}
+
+.main-input-side {
+  @apply main-input;
+  @apply w-10/12;
+  @apply bg-gray-100;
+  @apply rounded-none;
+  @apply rounded-l-lg;
+}
+
+.main-input-side-button {
+  @apply cursor-pointer;
+  @apply px-4;
+  @apply w-2/12;
+  @apply h-12;
+  @apply border;
+  @apply border-l-0;
+  @apply text-lg;
+  @apply text-white;
+  @apply rounded-r-lg;
+  @apply bg-gray-600;
+  @apply hover:bg-gray-700;
+  @apply focus:outline-none;
+}
+
+.main-input-side-button:focus {
+  @apply outline-none;
+}
+
+.main-submit {
+  @apply btn;
+  @apply btn-primary;
+  @apply inline-flex;
+  @apply items-center;
+  @apply py-2;
+  @apply px-4;
+  @apply border;
+  @apply border-transparent;
+  @apply shadow-sm;
+  @apply font-medium;
+  @apply leading-6;
+  @apply rounded-md;
+  @apply text-white;
+}
+
+.main-submit-loading {
+  @apply main-submit;
+  @apply opacity-50;
+  @apply cursor-not-allowed;
+  @apply loading;
+}
+
+.main-input-description {
+  @apply mb-2;
+  @apply text-sm;
+  @apply text-gray-500;
+  @apply dark:text-gray-400;
+}

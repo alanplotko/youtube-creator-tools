@@ -1,7 +1,10 @@
 import { shortenString, truncateString } from '@/lib/macros';
+import Alert from '@/components/Alert';
 import Image from 'next/image';
 import Link from 'next/link';
+import SearchInput from '@/components/Form/SearchInput';
 import axios from 'axios';
+import classNames from 'classnames';
 import { errors } from '@/constants/errors';
 import { useState } from 'react';
 
@@ -16,13 +19,6 @@ export default function CreateProjectStage2({ project, completeCallback }) {
     isFormValid: false,
   };
   const [state, setState] = useState(defaultState);
-
-  const getSubmitButtonText = () => {
-    if (state.isSubmitLoading) {
-      return 'Saving...';
-    }
-    return state.success ? 'Saved!' : 'Save';
-  };
 
   const handleToggleSelectAll = () => {
     const { checked } = document.querySelector('input#selectAll');
@@ -118,49 +114,38 @@ export default function CreateProjectStage2({ project, completeCallback }) {
   return (
     <>
       {state.error && (
-        <div className="bg-orange-100 border-t-4 border-orange-500 text-orange-700 p-4" role="alert">
-          <p className="font-bold">Error Encountered!</p>
-          <p>{state.error}</p>
-        </div>
+        <Alert
+          type="error"
+          alertText={state.error}
+        />
       )}
       {state.success && (
-        <div className="bg-green-100 border-t-4 border-green-500 text-green-700 p-4" role="alert">
-          <p className="font-bold">Project Updated!</p>
-          <p className="underline">
-            <Link href={`/projects/${project.slug}`}>
-              {`Navigate to ${project.name} \u00BB`}
-            </Link>
-          </p>
-        </div>
+        <Alert
+          type="success"
+          alertHeading="Project Updated!"
+          alertText={`Navigate to ${project.name} \u00BB`}
+          alertLink={`/projects/${project.slug}`}
+        />
       )}
       <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
         <form id="videoSearch" onSubmit={handleSearch}>
           <fieldset id="searchFields" disabled={(state.isSubmitLoading || state.isSearchLoading || state.success) ? 'disabled' : ''}>
-            <div className="grid grid-cols-3 gap-6">
+            <div className="main-grid">
               <div className="col-span-2">
                 {/* Search */}
-                <label htmlFor="search" className="block first-line:text-md font-medium text-gray-700">
-                  Video Search Query
-                  <span className="text-red-500">*</span>
-                </label>
-                <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">Search across your videos to add to this project.</p>
-                <div className="input-group">
-                  <input
-                    id="search"
-                    name="search"
-                    className="w-10/12 h-12 px-4 mb-2 text-lg text-gray-700 placeholder-gray-600 border rounded-l-lg focus:shadow-outline shadow-sm"
-                    type="text"
-                    required="required"
-                    placeholder="Search videos, e.g. Triangle Strategy"
-                  />
-                  <button
-                    type="submit"
-                    disabled={(state.isSearchLoading || state.success) ? 'disabled' : ''}
-                    className={`${state.isSearchLoading ? 'loading' : ''} btn btn-primary`}
-                  >
-                    Search
-                  </button>
-                </div>
+                <SearchInput
+                  label="Video Search Query"
+                  helpText="Search across your videos to add to this project."
+                  id="search"
+                  name="search"
+                  required
+                  placeholder="Search videos, e.g. Triangle Strategy"
+                  button={{
+                    disabled: state.isSearchLoading || state.success,
+                    isLoading: state.isSearchLoading,
+                    text: 'Search',
+                  }}
+                />
               </div>
             </div>
           </fieldset>
@@ -179,10 +164,12 @@ export default function CreateProjectStage2({ project, completeCallback }) {
               <button
                 id="submit"
                 type="submit"
-                disabled={(state.isSubmitLoading || !state.isFormValid || state.success) ? 'disabled' : ''}
-                className={`${state.isSubmitLoading ? 'loading' : ''} btn btn-primary btn-wide mb-2`}
+                disabled={state.isSubmitLoading || !state.isFormValid || state.success}
+                className={classNames('btn btn-primary btn-wide mb-2', {
+                  loading: state.isSubmitLoading,
+                })}
               >
-                {getSubmitButtonText()}
+                Save
               </button>
               <p className={`${state.isFormValid ? 'invisible' : ''} text-sm mb-5`}>Please select at least 1 video to proceed</p>
               <div className="overflow-x-auto w-full">
