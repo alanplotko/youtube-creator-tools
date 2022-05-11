@@ -2,7 +2,7 @@ import { getSession, useSession } from 'next-auth/react';
 import { shortenString, truncateString } from '@/lib/macros';
 import Image from 'next/image';
 import Link from 'next/link';
-import NoDataCard from '@/components/NoDataCard';
+import NoDataCard from '@/components/Card/NoDataCard';
 import axios from 'axios';
 import moment from 'moment';
 import prisma from '@/lib/prisma';

@@ -1,8 +1,8 @@
 import { getSession, useSession } from 'next-auth/react';
-import CreateItemCard from '@/components/CreateItemCard';
+import CreateItemCard from '@/components/Card/CreateItemCard';
 import Image from 'next/image';
 import Link from 'next/link';
-import NoDataCard from '@/components/NoDataCard';
+import NoDataCard from '@/components/Card/NoDataCard';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
 

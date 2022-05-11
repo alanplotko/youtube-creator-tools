@@ -1,5 +1,5 @@
 import ChannelStats from '@/components/ChannelStats';
-import LoginCard from '@/components/LoginCard';
+import LoginCard from '@/components/Card/LoginCard';
 import { useSession } from 'next-auth/react';
 
 export default function Home() {
