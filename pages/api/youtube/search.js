@@ -109,6 +109,7 @@ export default async function handler(req, res) {
       if (error) {
         return buildError(res, errors.YOUTUBE_API_GENERIC_ERROR, {
           code: error.code,
+          message: error.message,
           serviceMessage: error.message,
         });
       }

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+const htmlRegex = /<[^>]+>/g;
+
 export default function Alert({
   type, alertHeading, alertText, alertLink,
 }) {
@@ -9,7 +11,7 @@ export default function Alert({
   switch (alertType) {
     case 'success':
       title = alertHeading ?? 'Successfully saved!';
-      icon = 'bi-check-circle';
+      icon = 'bi-chseck-circle';
       break;
     case 'error':
       title = alertHeading ?? 'Error encountered!';
@@ -36,7 +38,7 @@ export default function Alert({
             </p>
           )}
           {!alertLink && (
-            <p>{alertText}</p>
+            <p>{alertText.replace(htmlRegex, '')}</p>
           )}
         </div>
       </div>
