@@ -1,4 +1,4 @@
-import { buildError, errors } from '@/constants/errors';
+import { buildError, errors, isPrismaError } from '@/constants/errors';
 import axios from 'axios';
 import { v2 as cloudinary } from 'cloudinary';
 import { getToken } from 'next-auth/jwt';
@@ -28,16 +28,19 @@ export default async function handler(req, res) {
     const user = name;
     const { query } = req.query;
 
-    const videoSearch = await prisma.VideoSearch.findFirst({
-      where: { user, query },
-      include: { videos: true },
-    });
-    if (videoSearch) {
-      // Search query already exists
-      return res.status(200).json(videoSearch);
-    }
-
     try {
+      const videoSearch = await prisma.VideoSearch.upsert({
+        where: { user_query: { user, query } },
+        update: {},
+        create: { user, query },
+        include: { videos: true },
+      });
+
+      // Search query already exists and is non-empty
+      if (videoSearch.videos.length > 0) {
+        return res.status(200).json(videoSearch);
+      }
+
       // Get general channel information
       const response = await axios.get(SEARCH, {
         headers: {
@@ -64,22 +67,27 @@ export default async function handler(req, res) {
           },
         } = video;
         const result = await uploadThumbnail(url, `${user}/${query}/${videoId}`);
-        return {
+        const item = {
           user,
           videoId,
+          publishedAt,
           title,
           description,
-          publishedAt,
+          tags: video?.snippet?.tags?.join(',') ?? null,
           image_thumbnail: result.secure_url,
+        };
+        return {
+          create: item,
+          update: item,
+          where: { videoId },
         };
       }));
 
-      const result = await prisma.VideoSearch.create({
+      const result = await prisma.VideoSearch.update({
+        where: { user_query: { user, query } },
         data: {
-          user,
-          query,
           videos: {
-            create: videos,
+            upsert: videos,
           },
         },
         include: {
@@ -89,6 +97,13 @@ export default async function handler(req, res) {
 
       return res.status(response.status).json(result);
     } catch (e) {
+      // Catch Prisma error
+      if (isPrismaError(e)) {
+        return buildError(res, errors.PRISMA_GENERIC_ERROR, {
+          code: 500,
+          message: `[${e.code}] ${e.message}`,
+        });
+      }
       // Catch YouTube API error
       const error = e?.response?.data?.error;
       if (error) {
@@ -98,7 +113,7 @@ export default async function handler(req, res) {
         });
       }
       // Catch all other errors
-      return buildError(res, errors.YOUTUBE_API_GENERIC_ERROR, { code: e.status });
+      return buildError(res, errors.CATCH_ALL_GENERIC_ERROR, { code: e.status });
     }
   }
 

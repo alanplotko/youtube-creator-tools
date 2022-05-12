@@ -1,4 +1,4 @@
-import { buildError, errors } from '@/constants/errors';
+import { buildError, errors, isPrismaError } from '@/constants/errors';
 import axios from 'axios';
 import { v2 as cloudinary } from 'cloudinary';
 import { getToken } from 'next-auth/jwt';
@@ -32,16 +32,16 @@ export default async function handler(req, res) {
 
     try {
       // Get latest stats from database
-      let stats = await prisma.TopVideos
-        .findFirst({
-          where: { user },
-          include: { videos: { orderBy: { viewCount: 'desc' } } },
-        })
-        .then((response) => JSON.parse(JSON.stringify(response)));
+      let stats = await prisma.TopVideos.upsert({
+        where: { user },
+        update: {},
+        create: { user },
+        include: { videos: { orderBy: { viewCount: 'desc' } } },
+      });
 
       // Stats = null when not found in database for user
       const isStale = stats?.updatedAt && moment().diff(stats.updatedAt, 'hours') >= 4;
-      if (forceRefresh === 'false' && stats !== null && !isStale) {
+      if (forceRefresh === 'false' && stats.videos.length > 0 && !isStale) {
         return res.status(200).json(stats);
       }
 
@@ -79,18 +79,19 @@ export default async function handler(req, res) {
         const {
           id,
           snippet: {
-            publishedAt, title, tags, thumbnails: { maxres: { url } },
+            publishedAt, title, description, tags, thumbnails: { maxres: { url } },
           },
           statistics: {
             viewCount, likeCount, dislikeCount, favoriteCount, commentCount,
           },
         } = video;
         const result = await uploadThumbnail(url, `${user}/top_videos/${id}`);
-        return {
+        const item = {
           user,
           videoId: id,
           publishedAt,
           title,
+          description,
           tags: tags.join(','),
           image_thumbnail: result.secure_url,
           viewCount: parseInt(viewCount, 10),
@@ -99,49 +100,38 @@ export default async function handler(req, res) {
           favoriteCount: parseInt(favoriteCount, 10),
           commentCount: parseInt(commentCount, 10),
         };
+        return {
+          create: item,
+          update: item,
+          where: { videoId: id },
+        };
       }));
 
-      if (stats === null) {
-        const data = {
-          user,
-          videos: { create: topVideos },
-        };
-        stats = await prisma.TopVideos.create({
-          where: { user },
-          data,
-          include: {
-            videos: {
-              orderBy: {
-                viewCount: 'desc',
-              },
+      stats = await prisma.TopVideos.update({
+        where: { user },
+        data: {
+          videos: {
+            upsert: topVideos,
+          },
+        },
+        include: {
+          videos: {
+            orderBy: {
+              viewCount: 'desc',
             },
           },
-        });
-      } else {
-        await prisma.TopVideos.update({
-          where: { user },
-          data: {
-            videos: { deleteMany: {} },
-          },
-        });
-        stats = await prisma.TopVideos.update({
-          where: { user },
-          data: {
-            user,
-            videos: { create: topVideos },
-          },
-          include: {
-            videos: {
-              orderBy: {
-                viewCount: 'desc',
-              },
-            },
-          },
-        });
-      }
+        },
+      });
 
       return res.status(200).json(stats);
     } catch (e) {
+      // Catch Prisma error
+      if (isPrismaError(e)) {
+        return buildError(res, errors.PRISMA_GENERIC_ERROR, {
+          code: 500,
+          message: `[${e.code}] ${e.message}`,
+        });
+      }
       // Catch YouTube API error
       const error = e?.response?.data?.error;
       if (error) {
@@ -151,7 +141,7 @@ export default async function handler(req, res) {
         });
       }
       // Catch all other errors
-      return buildError(res, errors.YOUTUBE_API_GENERIC_ERROR, { code: e.status });
+      return buildError(res, errors.CATCH_ALL_GENERIC_ERROR, { code: e.status });
     }
   }
 

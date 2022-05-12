@@ -1,4 +1,16 @@
+import {
+  PrismaClientInitializationError,
+  PrismaClientKnownRequestError,
+  PrismaClientRustPanicError,
+  PrismaClientUnknownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client';
+
 export const errors = {
+  CATCH_ALL_GENERIC_ERROR: ({ code }) => ({
+    code: code ?? 500,
+    message: 'Error performing action, please try again.',
+  }),
   CLOUDINARY_UPLOAD_ERROR: ({ code, message }) => ({
     code: code ?? 500,
     message: message ?? 'Image upload failed, please try again.',
@@ -6,6 +18,10 @@ export const errors = {
   INVALID_METHOD: ({ method }) => ({
     code: 405,
     message: `Method ${method} Not Allowed`,
+  }),
+  PRISMA_GENERIC_ERROR: ({ code, message }) => ({
+    code: code ?? 500,
+    message: message ?? 'Prisma query failed, please try again.',
   }),
   PROJECTS_GENERIC_SAVE_ERROR: ({ code, message }) => ({
     code: code ?? 500,
@@ -54,3 +70,9 @@ export const buildError = (res, error, args) => {
   const json = typeof error === 'function' ? error(args ?? {}) : error;
   return res.status(json.code).json({ error: json });
 };
+
+export const isPrismaError = (e) => e instanceof PrismaClientInitializationError
+  || e instanceof PrismaClientKnownRequestError
+  || e instanceof PrismaClientRustPanicError
+  || e instanceof PrismaClientUnknownRequestError
+  || e instanceof PrismaClientValidationError;

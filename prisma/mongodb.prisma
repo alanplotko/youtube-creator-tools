@@ -55,16 +55,26 @@ model VerificationToken {
 
 model Video {
     id              String          @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
     user            String
     videoId         String          @unique
     title           String
     description     String
+    tags            String?
     publishedAt     DateTime
     image_thumbnail String
-    projectIDs      String[]        @db.ObjectId
-    project         Project[]       @relation(fields: [projectIDs], references: [id])
-    searchIDs       String[]        @db.ObjectId
-    search          VideoSearch[]   @relation(fields: [searchIDs], references: [id])
+    viewCount       Int?
+    likeCount       Int?
+    dislikeCount    Int?
+    favoriteCount   Int?
+    commentCount    Int?
+    searchIds       String[]        @db.ObjectId
+    searches        VideoSearch[]   @relation(fields: [searchIds], references: [id])
+    projectIds      String[]        @db.ObjectId
+    projects        Project[]       @relation(fields: [projectIds], references: [id])
+    topVideosId     String?         @db.ObjectId
+    topVideos       TopVideos?      @relation(fields: [topVideosId], references: [id])
 }
 
 model VideoSearch {
@@ -72,9 +82,11 @@ model VideoSearch {
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
     user            String
-    query           String   @unique
-    videoIDs        String[] @db.ObjectId
-    videos          Video[]  @relation(fields: [videoIDs], references: [id])
+    query           String
+    videoIds        String[] @db.ObjectId
+    videos          Video[]  @relation(fields: [videoIds], references: [id])
+
+    @@unique([user, query])
 }
 
 model Project {
@@ -89,8 +101,8 @@ model Project {
     user            String
     archived        Boolean  @default(false)
     published       Boolean  @default(false)
-    videoIDs        String[] @db.ObjectId
-    videos          Video[]  @relation(fields: [videoIDs], references: [id])
+    videoIds        String[] @db.ObjectId
+    videos          Video[]  @relation(fields: [videoIds], references: [id])
 
     @@index([user, archived, createdAt(sort: Desc)])
 }
@@ -118,21 +130,5 @@ model TopVideos {
     createdAt               DateTime @default(now())
     updatedAt               DateTime @updatedAt
     user                    String   @unique
-    videos                  VideoStat[]
-}
-
-model VideoStat {
-    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
-    videoId                 String      @unique
-    publishedAt             DateTime
-    title                   String
-    tags                    String
-    image_thumbnail         String
-    viewCount               Int
-    likeCount               Int
-    dislikeCount            Int
-    favoriteCount           Int
-    commentCount            Int
-    topVideos               TopVideos?   @relation(fields: [topVideosId], references: [id])
-    topVideosId             String?
+    videos                  Video[]
 }

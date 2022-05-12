@@ -9,7 +9,7 @@ generator client {
 }
 
 model Account {
-    id                String    @id @default(cuid())
+    id                String  @id @default(cuid())
     userId            String
     type              String
     provider          String
@@ -21,7 +21,7 @@ model Account {
     scope             String?
     id_token          String?
     session_state     String?
-    user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
 }
@@ -53,24 +53,36 @@ model VerificationToken {
 }
 
 model Video {
-    id              String          @id @default(cuid())
+    id              String        @id @default(cuid())
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
     user            String
-    videoId         String          @unique
+    videoId         String        @unique
     title           String
     description     String
+    tags            String?
     publishedAt     DateTime
     image_thumbnail String
-    project         Project[]
-    search          VideoSearch[]
+    viewCount       Int?
+    likeCount       Int?
+    dislikeCount    Int?
+    favoriteCount   Int?
+    commentCount    Int?
+    searches        VideoSearch[]
+    projects        Project[]
+    topVideos       TopVideos?    @relation(fields: [topVideosId], references: [id])
+    topVideosId     String?
 }
 
 model VideoSearch {
-    id              String   @id @default(cuid())
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
-    user            String
-    query           String   @unique
-    videos          Video[]
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      String
+    query     String
+    videos    Video[]
+
+    @@unique([user, query])
 }
 
 model Project {
@@ -109,26 +121,9 @@ model ChannelStats {
 }
 
 model TopVideos {
-    id                      String   @id @default(cuid())
-    createdAt               DateTime @default(now())
-    updatedAt               DateTime @updatedAt
-    user                    String   @unique
-    videos                  VideoStat[]
-}
-
-model VideoStat {
-    id                      String      @id @default(cuid())
-    user                    String
-    videoId                 String      @unique
-    publishedAt             DateTime
-    title                   String
-    tags                    String
-    image_thumbnail         String
-    viewCount               Int
-    likeCount               Int
-    dislikeCount            Int
-    favoriteCount           Int
-    commentCount            Int
-    topVideos               TopVideos?   @relation(fields: [topVideosId], references: [id])
-    topVideosId             String?
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    user      String   @unique
+    videos    Video[]
 }
