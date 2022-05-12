@@ -1,26 +1,27 @@
 import Link from 'next/link';
-import classNames from 'classnames';
 
 export default function Alert({
   type, alertHeading, alertText, alertLink,
 }) {
-  // Default to information alert
-  let alertColor = 'gray';
-  let title = 'For your information...';
-
-  if (type) {
-    if (type.toLowerCase() === 'success') {
+  let alertColor;
+  let title;
+  switch (type) {
+    case 'success':
       alertColor = 'green';
       title = alertHeading ?? 'Successfully saved!';
-    }
-    if (type.toLowerCase() === 'error') {
+      break;
+    case 'error':
       alertColor = 'orange';
       title = alertHeading ?? 'Error encountered!';
-    }
+      break;
+    default:
+      alertColor = 'gray';
+      title = alertHeading ?? 'For your information...';
+      break;
   }
 
   return (
-    <div className={classNames('border-t-4', 'p-4', `bg-${alertColor}-100`, `border-${alertColor}-500`, `text-${alertColor}-700`)} role="alert">
+    <div className={`border-t-4 p-4 bg-${alertColor}-100 border-${alertColor}-500 text-${alertColor}-700`} role="alert">
       <p className="font-bold text-lg">{title}</p>
       {alertLink && (
         <p className="underline">
