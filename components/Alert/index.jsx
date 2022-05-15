@@ -11,7 +11,7 @@ export default function Alert({
   switch (alertType) {
     case 'success':
       title = alertHeading ?? 'Successfully saved!';
-      icon = 'bi-chseck-circle';
+      icon = 'bi-check-circle';
       break;
     case 'error':
       title = alertHeading ?? 'Error encountered!';

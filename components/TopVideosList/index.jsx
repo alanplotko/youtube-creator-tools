@@ -16,6 +16,14 @@ const useStats = (swrKey) => {
   };
 };
 
+const loadingBuffer = (new Array(10)).fill(null).map((val, index) => (
+  // Simple static list as loading buffer, so index will suffice for key
+  // eslint-disable-next-line react/no-array-index-key
+  <li key={index} className="step">
+    <div className="w-96 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />
+  </li>
+));
+
 export default function TopVideosList({ user }) {
   const swrKey = {
     url: '/api/youtube/top_videos', user, forceRefresh: false,
@@ -77,13 +85,14 @@ export default function TopVideosList({ user }) {
             {video.likeCount > 0 && `, ${video.likeCount} ${video.likeCount > 1 ? 'likes' : 'like'}`}
             {
               (video.likeCount > 0 || video.dislikeCount > 0)
-                && `, ${Math.round((video.likeCount / (video.likeCount + video.dislikeCount)) * 100)}%`
+              && `, ${Math.round((video.likeCount / (video.likeCount + video.dislikeCount)) * 100)}%`
             }
             ]
             {' '}
             {truncateString(video.title, 60)}
           </li>
         ))}
+        {isLoading && loadingBuffer}
       </ul>
       <div className="my-5" />
       <button id="refresh" type="button" onClick={handleRefresh} className={`btn btn-primary ${state.isRefreshing ? 'loading' : ''}`} disabled={state.isRefreshing}>

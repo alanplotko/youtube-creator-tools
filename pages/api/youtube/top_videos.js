@@ -86,7 +86,7 @@ export default async function handler(req, res) {
           },
         } = video;
         const result = await uploadThumbnail(url, `${user}/top_videos/${id}`);
-        const item = {
+        return {
           user,
           videoId: id,
           publishedAt,
@@ -100,18 +100,24 @@ export default async function handler(req, res) {
           favoriteCount: parseInt(favoriteCount, 10),
           commentCount: parseInt(commentCount, 10),
         };
-        return {
-          create: item,
-          update: item,
-          where: { videoId: id },
-        };
       }));
 
+      // Create (or update) underlying top videos in Video schema
+      await prisma.$transaction(
+        topVideos.map((video) => prisma.Video.upsert({
+          where: { videoId: video.videoId },
+          update: video,
+          create: video,
+        })),
+      );
+
+      // Update user's top videos to point to latest 10 (since top 10 videos can change)
       stats = await prisma.TopVideos.update({
         where: { user },
         data: {
+          user, // Force update of updatedAt timestamp
           videos: {
-            upsert: topVideos,
+            set: topVideos.map((video) => ({ videoId: video.videoId })),
           },
         },
         include: {

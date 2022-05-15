@@ -111,15 +111,15 @@ export default function ChannelStats({ user }) {
           <div key={stat.field} className="stat">
             <div className="stat-figure text-primary">
               {!isLoading && <i className={`bi bi-${stat.icon} text-4xl`} />}
-              {isLoading && <div className="w-16 h-16 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-12 h-12 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
             <div className="stat-title">
               {!isLoading && stat.title}
-              {isLoading && <div className="w-32 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
             <div className="stat-value text-primary">
               {!isLoading && data[stat.field].toLocaleString('en-US')}
-              {isLoading && <div className="w-16 h-8 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
           </div>
         ))}
@@ -130,15 +130,15 @@ export default function ChannelStats({ user }) {
           <div key={stat.field} className="stat">
             <div className="stat-figure text-secondary">
               {!isLoading && <i className={`bi bi-${stat.icon} text-4xl`} />}
-              {isLoading && <div className="w-16 h-16 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-12 h-12 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
             <div className="stat-title">
               {!isLoading && stat.title}
-              {isLoading && <div className="w-32 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
             <div className="stat-value text-secondary">
               {!isLoading && data[stat.field].toLocaleString('en-US')}
-              {isLoading && <div className="w-16 h-8 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
           </div>
         ))}

@@ -7,6 +7,7 @@ import axios from 'axios';
 import classNames from 'classnames';
 import { errors } from '@/constants/errors';
 import { useState } from 'react';
+import styles from './CreateProjectStage2.module.css';
 
 export default function CreateProjectStage2({ project, completeCallback }) {
   const defaultState = {
@@ -130,122 +131,163 @@ export default function CreateProjectStage2({ project, completeCallback }) {
       <div className="px-4 py-5 bg-white space-y-6 sm:p-6">
         <form id="videoSearch" onSubmit={handleSearch}>
           <fieldset id="searchFields" disabled={(state.isSubmitLoading || state.isSearchLoading || state.success) ? 'disabled' : ''}>
-            <div className="main-grid">
-              <div className="col-span-2">
-                {/* Search */}
-                <SearchInput
-                  label="Video Search Query"
-                  helpText="Search across your videos to add to this project."
-                  id="search"
-                  name="search"
-                  required
-                  placeholder="Search videos, e.g. Triangle Strategy"
-                  button={{
-                    disabled: state.isSearchLoading || state.success,
-                    isLoading: state.isSearchLoading,
-                    text: 'Search',
-                  }}
-                />
-              </div>
-            </div>
+            {/* Search */}
+            <SearchInput
+              label="Video Search Query"
+              helpText="Search across your videos to add to this project."
+              id="search"
+              name="search"
+              required
+              placeholder="Search videos, e.g. Triangle Strategy"
+              button={{
+                disabled: state.isSearchLoading || state.success,
+                isLoading: state.isSearchLoading,
+                text: 'Search',
+              }}
+            />
           </fieldset>
         </form>
         <form id="videoSelect" onSubmit={handleSubmit}>
           <fieldset id="selectFields" disabled={(state.isSubmitLoading || state.isSearchLoading || state.success) ? 'disabled' : ''}>
-            <div className="col-span-4">
-              <hr className="border-0.5 border-gray-300 mb-5" />
-              <h1 className="text-xl font-semibold mb-5">
-                Video Search Query:
-                {' '}
-                <span className="font-normal">
-                  {state.query}
-                </span>
-              </h1>
-              <button
-                id="submit"
-                type="submit"
-                disabled={state.isSubmitLoading || !state.isFormValid || state.success}
-                className={classNames('btn btn-primary btn-wide mb-2', {
-                  loading: state.isSubmitLoading,
-                })}
-              >
-                Save
-              </button>
-              <p className={`${state.isFormValid ? 'invisible' : ''} text-sm mb-5`}>Please select at least 1 video to proceed</p>
-              <div className="overflow-x-auto w-full">
-                <table className="table w-full">
-                  <thead>
-                    <tr>
-                      <th>
-                        {state.videos.length > 0 && (
-                          <label>
-                            <input id="selectAll" type="checkbox" className="checkbox" onClick={handleToggleSelectAll} />
-                          </label>
-                        )}
-                      </th>
-                      <th>Title</th>
-                      <th>Description</th>
-                      <th>Video Link</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {state.videos.length === 0 && (
-                      <tr>
-                        <td colSpan="4">
-                          <span className="text-gray-600 italic">Search for videos to add to the project...</span>
-                        </td>
-                      </tr>
-                    )}
-                    {state.videos.length > 0 && state.videos.map((video) => (
-                      <tr key={video.title}>
-                        <td>
-                          <label>
-                            <input type="checkbox" className="checkbox" name="video" value={video.videoId} onChange={handleSelectionChange} />
-                          </label>
-                        </td>
-                        <td>
-                          <div className="flex items-center space-x-3">
-                            <div className="avatar">
-                              <div className="mask mask-squircle w-12 h-12 relative">
-                                <Image layout="fill" src={video.image_thumbnail} alt={`Video thumbnail for ${video.title.substr(0, 10)}...${video.title.substr(-8)}`} />
-                              </div>
-                            </div>
-                            <div>
-                              <div className="font-bold">{truncateString(video.title)}</div>
-                              <div className="text-sm opacity-50">
-                                Video ID:
-                                {' '}
-                                {video.videoId}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          {video.description ? shortenString(video.description) : 'No description'}
-                        </td>
-                        <td>
-                          <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
-                            <a target="_blank">
-                              <button className="btn btn-ghost btn-md" type="button">View</button>
-                            </a>
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  {state.videos.length > 0 && (
-                    <tfoot>
-                      <tr>
-                        <th>&nbsp;</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Video Link</th>
-                      </tr>
-                    </tfoot>
-                  )}
-                </table>
-              </div>
+            <hr className="border-0.5 border-gray-300 mb-5" />
+            <h1 className="text-xl font-semibold mb-5">
+              Video Search Query:
+              {' '}
+              <span className="font-normal">
+                {state.query}
+              </span>
+            </h1>
+            <button
+              id="submit"
+              type="submit"
+              disabled={state.isSubmitLoading || !state.isFormValid || state.success}
+              className={classNames('btn btn-primary btn-wide mb-2', {
+                loading: state.isSubmitLoading,
+              })}
+            >
+              Save
+            </button>
+            <p className={`${state.isFormValid ? 'invisible' : ''} text-sm mb-5`}>Please select at least 1 video to proceed</p>
+            <div>
+              <table className="table w-full">
+                <thead>
+                  <tr>
+                    <th className={styles.videoTable}>
+                      {state.videos.length > 0 && (
+                        <label>
+                          <input id="selectAll" type="checkbox" className="checkbox w-8 h-8" onClick={handleToggleSelectAll} />
+                        </label>
+                      )}
+                    </th>
+                  </tr>
+                </thead>
+              </table>
+              {state.videos.length > 0 && state.videos.map((video, index) => (
+                <div
+                  key={video.videoId}
+                  className={classNames('card card-side card-compact card-bordered rounded-none', {
+                    'border-b-0': index + 1 !== state.videos.length,
+                  })}
+                >
+                  <label className="cursor-pointer">
+                    <input type="checkbox" className="checkbox m-4 w-8 h-8" name="video" value={video.videoId} onChange={handleSelectionChange} />
+                  </label>
+                  <figure className="relative w-80 flex-shrink-0">
+                    <Image layout="fill" objectFit="contain" className="bg-black" src={video.image_thumbnail} alt="Video thumbnail" />
+                  </figure>
+                  <div className="card-body">
+                    <h2 className="card-title text-lg">{video.title}</h2>
+                    <p className="text-sm opacity-50">
+                      Video ID:
+                      {' '}
+                      {video.videoId}
+                    </p>
+                    <p>{video.description ? truncateString(video.description, 200) : 'No description'}</p>
+                    <div className="card-actions justify-end">
+                      <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
+                        <a target="_blank">
+                          <button className="btn btn-primary" type="button">View on YouTube</button>
+                        </a>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
+            {/* <table className="table w-full">
+              <thead>
+                <tr>
+                  <th>
+                    {state.videos.length > 0 && (
+                      <label>
+                        <input id="selectAll" type="checkbox" className="checkbox" onClick={handleToggleSelectAll} />
+                      </label>
+                    )}
+                  </th>
+                  <th>Video Details</th>
+                  <th>Video Link</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.videos.length === 0 && (
+                  <tr>
+                    <td colSpan="4">
+                      <span className="text-gray-600 italic">Search for videos to add to the project...</span>
+                    </td>
+                  </tr>
+                )}
+                {state.videos.length > 0 && state.videos.map((video) => (
+                  <tr key={video.title}>
+                    <td>
+                      <label>
+                        <input type="checkbox" className="checkbox" name="video" value={video.videoId} onChange={handleSelectionChange} />
+                      </label>
+                    </td>
+                    <td>
+                      <div className="flex items-center space-x-3">
+                        <div className="avatar">
+                          <div className="w-32 h-24">
+                            <Image layout="fill" objectFit="cover" src={video.image_thumbnail} alt="Video thumbnail" />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="font-bold w-10 break-normal">{video.title}</div>
+                          <div className="text-sm opacity-50">United States</div>
+                        </div>
+                      </div>
+                      <figure className="relative w-64 flex-shrink-0">
+                        <Image layout="fill" objectFit="cover" src={video.image_thumbnail} alt="Video thumbnail" />
+                      </figure>
+                      <p className="font-bold w-6/12">{video.title}</p>
+                      <p className="text-sm opacity-50">
+                        Video ID:
+                        {' '}
+                        {video.videoId}
+                      </p>
+                      <p className="w-6/12 block">
+                        {video.description ?? 'No description'}
+                      </p>
+                    </td>
+                    <td>
+                      <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
+                        <a target="_blank">
+                          <button className="btn btn-ghost btn-md" type="button">View</button>
+                        </a>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+              {state.videos.length > 0 && (
+                <tfoot>
+                  <tr>
+                    <th>&nbsp;</th>
+                    <th>Video Details</th>
+                    <th>Video Link</th>
+                  </tr>
+                </tfoot>
+              )}
+            </table> */}
           </fieldset>
         </form>
       </div>

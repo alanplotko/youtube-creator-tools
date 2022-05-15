@@ -1,0 +1,3 @@
+.videoTable {
+    @apply rounded-bl-none rounded-br-none !important;
+}

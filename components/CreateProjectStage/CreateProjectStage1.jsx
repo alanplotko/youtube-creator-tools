@@ -179,6 +179,7 @@ export default function CreateProjectStage1() {
                   helpText="Upload a custom thumbnail for this project (3MB limit, type = PNG, JPG, or JPEG)."
                   id="thumbnail"
                   name="thumbnail"
+                  required
                   uploadValid={state.uploadValid}
                   uploadFileName={state.uploadFileName}
                   uploadResultMessage={state.uploadResultMessage}

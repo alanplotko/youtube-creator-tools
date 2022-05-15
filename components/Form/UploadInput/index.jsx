@@ -52,9 +52,8 @@ export default function UploadInput({
             type="file"
             id={id}
             name={name}
-            className="opacity-0"
+            className="opacity-0 cursor-pointer"
             required
-            hidden
             {...customAttributes}
           />
         </label>
