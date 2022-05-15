@@ -7,7 +7,9 @@ const navigation = [
   { name: 'Home', path: '/' },
   { name: 'Projects', path: '/projects' },
 ];
-const userNavigation = [];
+const userNavigation = [
+  { name: 'Settings', path: '/settings' },
+];
 
 export default function Navigation() {
   const router = useRouter();

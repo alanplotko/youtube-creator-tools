@@ -48,6 +48,13 @@ a {
   @apply text-slate-600;
 }
 
+.main-subheader {
+  @apply text-2xl;
+  @apply mb-5;
+  @apply font-medium;
+  @apply text-slate-600;
+}
+
 .main-section-header {
   @apply text-lg;
   @apply font-medium;

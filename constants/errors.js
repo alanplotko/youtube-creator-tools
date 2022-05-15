@@ -31,6 +31,14 @@ export const errors = {
     code: code ?? 500,
     message: message ?? 'Failed to archive project, please try again.',
   }),
+  PROJECTS_GENERIC_UNARCHIVE_ERROR: ({ code, message }) => ({
+    code: code ?? 500,
+    message: message ?? 'Failed to unarchive project(s), please try again.',
+  }),
+  PROJECTS_GENERIC_DELETE_ERROR: ({ code, message }) => ({
+    code: code ?? 500,
+    message: message ?? 'Failed to delete project(s), please try again.',
+  }),
   PROJECTS_GENERIC_UPDATE_ERROR: ({ code, message }) => ({
     code: code ?? 500,
     message: message ?? 'Failed to update project, please try again.',

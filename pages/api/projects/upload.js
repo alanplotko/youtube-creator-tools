@@ -25,8 +25,8 @@ async function parseForm(req) {
         reject(err);
       } else {
         // Unpack data
-        console.log(fields);
         const { name, slug, description } = fields;
+        // Form provides both slugs if slug is overridden, so we always want the last posiiton
         req.body = { name: name[0], slug: slug[slug.length - 1], description: description[0] };
         resolve(files.thumbnail[0]);
       }

@@ -1,4 +1,3 @@
-import { shortenString, truncateString } from '@/lib/macros';
 import Alert from '@/components/Alert';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,7 +5,9 @@ import SearchInput from '@/components/Form/SearchInput';
 import axios from 'axios';
 import classNames from 'classnames';
 import { errors } from '@/constants/errors';
+import { truncateString } from '@/lib/macros';
 import { useState } from 'react';
+// eslint-disable-next-line sort-imports
 import styles from './CreateProjectStage2.module.css';
 
 export default function CreateProjectStage2({ project, completeCallback }) {
@@ -216,80 +217,6 @@ export default function CreateProjectStage2({ project, completeCallback }) {
                 </div>
               ))}
             </div>
-            {/* <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>
-                    {state.videos.length > 0 && (
-                      <label>
-                        <input id="selectAll" type="checkbox" className="checkbox" onClick={handleToggleSelectAll} />
-                      </label>
-                    )}
-                  </th>
-                  <th>Video Details</th>
-                  <th>Video Link</th>
-                </tr>
-              </thead>
-              <tbody>
-                {state.videos.length === 0 && (
-                  <tr>
-                    <td colSpan="4">
-                      <span className="text-gray-600 italic">Search for videos to add to the project...</span>
-                    </td>
-                  </tr>
-                )}
-                {state.videos.length > 0 && state.videos.map((video) => (
-                  <tr key={video.title}>
-                    <td>
-                      <label>
-                        <input type="checkbox" className="checkbox" name="video" value={video.videoId} onChange={handleSelectionChange} />
-                      </label>
-                    </td>
-                    <td>
-                      <div className="flex items-center space-x-3">
-                        <div className="avatar">
-                          <div className="w-32 h-24">
-                            <Image layout="fill" objectFit="cover" src={video.image_thumbnail} alt="Video thumbnail" />
-                          </div>
-                        </div>
-                        <div>
-                          <div className="font-bold w-10 break-normal">{video.title}</div>
-                          <div className="text-sm opacity-50">United States</div>
-                        </div>
-                      </div>
-                      <figure className="relative w-64 flex-shrink-0">
-                        <Image layout="fill" objectFit="cover" src={video.image_thumbnail} alt="Video thumbnail" />
-                      </figure>
-                      <p className="font-bold w-6/12">{video.title}</p>
-                      <p className="text-sm opacity-50">
-                        Video ID:
-                        {' '}
-                        {video.videoId}
-                      </p>
-                      <p className="w-6/12 block">
-                        {video.description ?? 'No description'}
-                      </p>
-                    </td>
-                    <td>
-                      <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
-                        <a target="_blank">
-                          <button className="btn btn-ghost btn-md" type="button">View</button>
-                        </a>
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-              {state.videos.length > 0 && (
-                <tfoot>
-                  <tr>
-                    <th>&nbsp;</th>
-                    <th>Video Details</th>
-                    <th>Video Link</th>
-                  </tr>
-                </tfoot>
-              )}
-            </table> */}
           </fieldset>
         </form>
       </div>

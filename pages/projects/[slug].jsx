@@ -1,9 +1,11 @@
 import { getSession, useSession } from 'next-auth/react';
 import { shortenString, truncateString } from '@/lib/macros';
+import Alert from '@/components/Alert';
 import Image from 'next/image';
 import Link from 'next/link';
 import NoDataCard from '@/components/Card/NoDataCard';
 import axios from 'axios';
+import classNames from 'classnames';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
 import { useState } from 'react';
@@ -19,7 +21,7 @@ export default function ProjectView({ project }) {
     try {
       await axios.delete('/api/projects', { params: { slug } });
       setState({ ...defaultState, archived: true });
-      window.setTimeout(() => window.location.replace('/projects'), 3000);
+      window.location.replace('/projects');
     } catch (err) {
       setState({ ...defaultState, error: true });
     }
@@ -51,37 +53,34 @@ export default function ProjectView({ project }) {
                 Videos
               </h1>
               <label htmlFor="project" className="btn btn-primary modal-button float-right">Archive Project</label>
-              <input type="checkbox" id="project" className="modal-toggle" />
+              <input
+                type="checkbox"
+                id="project"
+                className="modal-toggle"
+                onChange={() => { setState({ ...state, error: false }); }}
+              />
               <label htmlFor="project" className="modal cursor-pointer">
                 <label className="modal-box relative">
-                  {(state.error || state.archived) && (
-                    <div className={`alert ${state.archived ? 'alert-success' : 'alert-error'} shadow-lg rounded-none absolute top-0 left-0`}>
-                      <div>
-                        {state.archived && (
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Successfully archived project. Redirecting shortly...</span>
-                          </>
-                        )}
-                        {!state.archived && (
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Error archiving project, please try again in a few moments.</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
+                  {state.error && (
+                    <Alert
+                      className="w-full absolute top-0 left-0 rounded-b-none space-y-10"
+                      includeHeading={false}
+                      type="error"
+                      alertText="Error archiving project, please try again in a few moments."
+                    />
                   )}
-                  <h3 className={`${state.error || state.archived ? 'mt-14' : ''} text-lg font-bold`}>Archive project?</h3>
+                  <h3
+                    className={classNames('text-lg font-bold', {
+                      'mt-10': state.error,
+                    })}
+                  >
+                    Archive project?
+                  </h3>
                   <p className="py-4">This will hide the project from the project listing. Click &quot;cancel&quot; or anywhere outside the modal to cancel.</p>
                   <div className="modal-action">
                     <label htmlFor="project">
                       <div
-                        className={`${state.isArchiving ? 'loading' : ''} btn btn-primary float-right`}
+                        className={classNames('btn btn-primary float-right', { loading: state.isArchiving })}
                         disabled={state.isArchiving || state.archived}
                         onClick={(e) => { archiveProject(e, project.slug); }}
                         role="presentation"
