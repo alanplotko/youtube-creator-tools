@@ -1,4 +1,5 @@
 import useSWR, { mutate } from 'swr';
+import Alert from '@/components/Alert';
 import axios from 'axios';
 import moment from 'moment';
 import { useState } from 'react';
@@ -31,8 +32,6 @@ const primaryStats = [
     icon: 'activity',
     title: 'Views',
   },
-];
-const secondaryStats = [
   {
     field: 'estimatedMinutesWatched',
     icon: 'pip',
@@ -77,14 +76,11 @@ export default function ChannelStats({ user }) {
     return (
       <div>
         <h1 className="main-header">Channel Stats</h1>
-        <div className="w-1/2 alert alert-error shadow-lg">
-          <div>
-            <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Error loading channel stats. Please try again shortly.</span>
-          </div>
-        </div>
+        <Alert
+          className="w-1/2"
+          type="error"
+          alertText="Error loading channel stats. Please try again shortly."
+        />
       </div>
     );
   }
@@ -92,19 +88,16 @@ export default function ChannelStats({ user }) {
   return (
     <div>
       <h1 className="main-header">Channel Stats</h1>
+
       {!isLoading && (
-        <div className="w-1/2 mb-5 h-10 alert alert-info shadow-lg">
-          <div>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>
-              Last updated
-              {' '}
-              {moment(data.updatedAt).fromNow()}
-            </span>
-          </div>
-        </div>
+        <Alert
+          className="w-1/2 mb-5"
+          includeHeading={false}
+          type="info"
+          alertText={`Last updated ${moment(data.updatedAt).fromNow()}`}
+          refreshHandler={handleRefresh}
+          isRefreshing={state.isRefreshing}
+        />
       )}
       <div className="stats shadow">
         {primaryStats.map((stat) => (
@@ -115,38 +108,15 @@ export default function ChannelStats({ user }) {
             </div>
             <div className="stat-title">
               {!isLoading && stat.title}
-              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-20 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
             <div className="stat-value text-primary">
               {!isLoading && data[stat.field].toLocaleString('en-US')}
-              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
+              {isLoading && <div className="w-16 h-8 mb-2 bg-gray-200 rounded-full animate-pulse" />}
             </div>
           </div>
         ))}
       </div>
-      <div className="my-5" />
-      <div className="stats shadow">
-        {secondaryStats.map((stat) => (
-          <div key={stat.field} className="stat">
-            <div className="stat-figure text-secondary">
-              {!isLoading && <i className={`bi bi-${stat.icon} text-4xl`} />}
-              {isLoading && <div className="w-12 h-12 mb-2 bg-gray-200 rounded-full animate-pulse" />}
-            </div>
-            <div className="stat-title">
-              {!isLoading && stat.title}
-              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
-            </div>
-            <div className="stat-value text-secondary">
-              {!isLoading && data[stat.field].toLocaleString('en-US')}
-              {isLoading && <div className="w-16 h-4 mb-2 bg-gray-200 rounded-full animate-pulse" />}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="my-5" />
-      <button id="refresh" type="button" onClick={handleRefresh} className={`btn btn-primary ${state.isRefreshing ? 'loading' : ''}`} disabled={state.isRefreshing}>
-        Refresh
-      </button>
     </div>
   );
 }

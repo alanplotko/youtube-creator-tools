@@ -34,6 +34,7 @@ export default function CreateProjectStage1() {
     uploadFileName: null,
   };
   const [state, setState] = useState(defaultState);
+
   const handleOverrideSlug = (e) => {
     e.preventDefault();
     if (state.override) {
@@ -44,6 +45,7 @@ export default function CreateProjectStage1() {
       override: !state.override,
     });
   };
+
   const handleSizeLimitCheck = (e) => {
     e.preventDefault();
     const input = document.querySelector('input#thumbnail');
@@ -70,6 +72,7 @@ export default function CreateProjectStage1() {
       uploadFileName,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setState({
@@ -81,7 +84,11 @@ export default function CreateProjectStage1() {
 
     // Use axios to submit the form
     try {
+      // Validate slug
+      await axios.post('/api/projects/validate', Object.fromEntries(project));
+      // Upload thumbnail
       const uploadResponse = await axios.post('/api/projects/upload', project);
+      // Persist project to database
       const saveResponse = await axios.post('/api/projects', uploadResponse.data.project);
       setState({
         ...defaultState,
@@ -105,12 +112,14 @@ export default function CreateProjectStage1() {
     <>
       {state.error && (
         <Alert
+          className="rounded-b-none"
           type="error"
           alertText={state.error}
         />
       )}
       {state.success && (
         <Alert
+          className="rounded-b-none"
           type="success"
           alertHeading="Project Saved!"
           alertText={`Begin adding videos to ${state.projectName} \u00BB`}

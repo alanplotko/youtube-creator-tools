@@ -116,12 +116,14 @@ export default function CreateProjectStage2({ project, completeCallback }) {
     <>
       {state.error && (
         <Alert
+          className="rounded-b-none"
           type="error"
           alertText={state.error}
         />
       )}
       {state.success && (
         <Alert
+          className="rounded-b-none"
           type="success"
           alertHeading="Project Updated!"
           alertText={`Navigate to ${project.name} \u00BB`}

@@ -25,8 +25,9 @@ async function parseForm(req) {
         reject(err);
       } else {
         // Unpack data
+        console.log(fields);
         const { name, slug, description } = fields;
-        req.body = { name: name[0], slug: slug[0], description: description[0] };
+        req.body = { name: name[0], slug: slug[slug.length - 1], description: description[0] };
         resolve(files.thumbnail[0]);
       }
     });

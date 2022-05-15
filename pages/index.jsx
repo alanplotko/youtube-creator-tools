@@ -10,10 +10,11 @@ export default function Home() {
     <div className="main-container">
       <LoginCard status={status} session={session} />
       {session && (
-        <div className="grid grid-cols-2 gap-4">
+        <>
           <ChannelStats user={session.user.name} />
+          <div className="mt-10" />
           <TopVideosList user={session.user.name} />
-        </div>
+        </>
       )}
     </div>
   );

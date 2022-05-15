@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import classNames from 'classnames';
 
 const htmlRegex = /<[^>]+>/g;
 
 export default function Alert({
-  type, alertHeading, alertText, alertLink,
+  className, type, alertHeading, alertText, alertLink,
+  includeHeading = true, refreshHandler, isRefreshing,
 }) {
   let title;
   let icon;
@@ -25,11 +27,22 @@ export default function Alert({
   }
 
   return (
-    <div className={`alert alert-${type} shadow-lg rounded-b-none`}>
+    <div
+      className={classNames(`alert alert-${type} shadow-md`, className, {
+        'h-10': !includeHeading,
+      })}
+    >
       <div>
-        <i className={`bi ${icon} text-4xl pr-2`} />
+        <i
+          className={classNames(`bi ${icon} pr-1`, {
+            'text-4xl': includeHeading,
+            'text-xl': !includeHeading,
+          })}
+        />
         <div className="flex-col">
-          <p className="font-semibold text-lg">{title}</p>
+          {includeHeading && (
+            <p className="font-semibold text-lg">{title}</p>
+          )}
           {alertLink && (
             <p className="underline">
               <Link href={alertLink}>
@@ -38,7 +51,12 @@ export default function Alert({
             </p>
           )}
           {!alertLink && (
-            <p>{alertText.replace(htmlRegex, '')}</p>
+            <span>{alertText.replace(htmlRegex, '')}</span>
+          )}
+          {refreshHandler && (
+            <button id="refresh" type="button" onClick={refreshHandler} className={classNames('btn btn-ghost btn-sm ml-2', { loading: isRefreshing })} disabled={isRefreshing}>
+              Refresh
+            </button>
           )}
         </div>
       </div>

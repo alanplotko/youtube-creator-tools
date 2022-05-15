@@ -13,6 +13,7 @@ export default function LoginCard({ status, session }) {
             Welcome back,
             {' '}
             {session.user.name}
+            !
           </h2>
         )}
         {status === 'unauthenticated' && (
