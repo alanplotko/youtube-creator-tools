@@ -1,4 +1,5 @@
 import { getSession, useSession } from 'next-auth/react';
+import Alert from '@/components/Alert';
 import Image from 'next/image';
 import axios from 'axios';
 import classNames from 'classnames';
@@ -77,9 +78,9 @@ export default function Settings({ archivedProjects }) {
     return (
       <div className="main-container">
         <h1 className="main-header">Settings</h1>
-        {archivedProjects.length === 0 && (
+        {/* {archivedProjects.length === 0 && (
           <>
-            <h2 className="main-subheader">Unarchive Projects</h2>
+            <h2 className="main-subheader">Manage Projects</h2>
             <div className="overflow-x-auto w-full">
               <table className="table min-w-fit w-1/2">
                 <thead>
@@ -107,98 +108,112 @@ export default function Settings({ archivedProjects }) {
               </table>
             </div>
           </>
-        )}
-        {archivedProjects.length > 0 && (
-          <form id="projectSelect" onSubmit={handleModifyProjects}>
-            <h2 className="main-subheader space-x-5">
-              <span>Unarchive Projects</span>
-              <button
-                id="submit"
-                type="submit"
-                name="unarchive"
-                disabled={!state.isFormValid || state.isUnarchiving || state.isDeleting}
-                className={classNames('btn btn-primary btn-sm', {
-                  loading: state.isUnarchiving,
-                })}
-              >
-                Unarchive Selected
-              </button>
-              <button
-                id="submit"
-                type="submit"
-                name="delete"
-                disabled={!state.isFormValid || state.isUnarchiving || state.isDeleting}
-                className={classNames('btn btn-error btn-sm', {
-                  loading: state.isDeleting,
-                })}
-              >
-                Delete Selected
-              </button>
-            </h2>
-            {archivedProjects.length > 0 && (
-              <fieldset id="searchFields" disabled={(state.isLoading) ? 'disabled' : ''}>
-                <div className="overflow-x-auto w-full">
-                  <table className="table min-w-fit w-1/2">
-                    <thead>
-                      <tr>
-                        <th>
-                          <label>
-                            <input id="selectAll" type="checkbox" className="checkbox" onClick={handleToggleSelectAll} />
-                          </label>
-                        </th>
-                        <th>Project</th>
-                        <th>Description</th>
-                        <th>Archive Date</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {archivedProjects.map((project) => (
-                        <tr key={project.slug}>
-                          <td>
-                            <label className="cursor-pointer">
-                              <input type="checkbox" className="checkbox" name="project" value={project.slug} onChange={handleSelectionChange} />
-                            </label>
-                          </td>
-                          <td>
-                            <div className="flex items-center space-x-3">
-                              <div className="avatar">
-                                <div className="relative w-20 h-11">
-                                  <Image
-                                    className={`${project.published ? 'group-hover:brightness-90' : 'brightness-50'} relative`}
-                                    layout="fill"
-                                    src={project.image_thumbnail}
-                                    alt="Project thumbnail"
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <div className="font-bold">{project.name}</div>
-                                <div className="text-sm opacity-50">
-                                  Slug:
-                                  {' '}
-                                  {project.slug}
-                                </div>
-                              </div>
+        )} */}
+
+        <form id="projectSelect" onSubmit={handleModifyProjects}>
+          <h2 className="main-subheader space-x-5">
+            <span>Manage Projects</span>
+            <button
+              id="submit"
+              type="submit"
+              name="unarchive"
+              disabled={!state.isFormValid || state.isUnarchiving || state.isDeleting}
+              className={classNames('btn btn-primary btn-sm', {
+                loading: state.isUnarchiving,
+              })}
+            >
+              Unarchive Selected
+            </button>
+            <button
+              id="submit"
+              type="submit"
+              name="delete"
+              disabled={!state.isFormValid || state.isUnarchiving || state.isDeleting}
+              className={classNames('btn btn-error btn-sm', {
+                loading: state.isDeleting,
+              })}
+            >
+              Delete Selected
+            </button>
+          </h2>
+          {state.error && (
+            <Alert
+              className="w-1/2 mb-5"
+              type="error"
+              alertText={state.error}
+            />
+          )}
+          <fieldset id="searchFields" disabled={(state.isLoading) ? 'disabled' : ''}>
+            <div className="overflow-x-auto w-full">
+              <table className="table min-w-fit w-1/2">
+                <thead>
+                  <tr>
+                    <th>
+                      <label>
+                        <input id="selectAll" type="checkbox" className="checkbox" onClick={handleToggleSelectAll} disabled={archivedProjects.length === 0} />
+                      </label>
+                    </th>
+                    <th>Project</th>
+                    <th>Description</th>
+                    <th>Archive Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {archivedProjects.length === 0 && (
+                    <tr>
+                      <td />
+                      <td className="italic text-gray-600">
+                        No archived projects found.
+                      </td>
+                      <td />
+                      <td />
+                    </tr>
+                  )}
+                  {archivedProjects.length > 0 && archivedProjects.map((project) => (
+                    <tr key={project.slug}>
+                      <td>
+                        <label className="cursor-pointer">
+                          <input type="checkbox" className="checkbox" name="project" value={project.slug} onChange={handleSelectionChange} />
+                        </label>
+                      </td>
+                      <td>
+                        <div className="flex items-center space-x-3">
+                          <div className="avatar">
+                            <div className="relative w-20 h-11">
+                              <Image
+                                className={`${project.published ? 'group-hover:brightness-90' : 'brightness-50'} relative`}
+                                layout="fill"
+                                src={project.image_thumbnail}
+                                alt="Project thumbnail"
+                              />
                             </div>
-                          </td>
-                          <td>
-                            {truncateString(project.description, 50)}
-                          </td>
-                          <td>
-                            <p className="text-sm font-bold">
-                              {moment(project.updatedAt).format('llll')}
-                            </p>
-                            <span className="badge badge-ghost badge-sm">{moment(project.updatedAt).fromNow()}</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </fieldset>
-            )}
-          </form>
-        )}
+                          </div>
+                          <div>
+                            <div className="font-bold">{project.name}</div>
+                            <div className="text-sm opacity-50">
+                              Slug:
+                              {' '}
+                              {project.slug}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        {truncateString(project.description, 50)}
+                      </td>
+                      <td>
+                        <p className="text-sm font-bold">
+                          {moment(project.updatedAt).format('llll')}
+                        </p>
+                        <span className="badge badge-ghost badge-sm">{moment(project.updatedAt).fromNow()}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </fieldset>
+        </form>
       </div>
     );
   }

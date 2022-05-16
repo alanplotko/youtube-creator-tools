@@ -1,5 +1,6 @@
 export default function TextInput({
-  id, name, label, helpText, required, disabled, placeholder, customAttributes, pattern,
+  id, name, label, helpText, required, disabled,
+  placeholder, customAttributes, pattern, defaultValue,
 }) {
   return (
     <div className="form-control w-full max-w-2xl">
@@ -26,6 +27,7 @@ export default function TextInput({
         placeholder={placeholder}
         pattern={pattern}
         disabled={disabled}
+        defaultValue={defaultValue}
         {...customAttributes}
       />
     </div>

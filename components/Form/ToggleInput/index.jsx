@@ -2,8 +2,8 @@ import classNames from 'classnames';
 import styles from './ToggleInput.module.css';
 
 export default function ToggleInput({
-  id, toggleId, name, label, helpText, required,
-  pattern, defaultAttributes, toggleAttributes, button,
+  id, toggleId, name, label, helpText, required, pattern,
+  defaultAttributes, toggleAttributes, button, defaultValue, defaultToggleValue,
 }) {
   return (
     <div className="form-control w-full max-w-2xl">
@@ -28,6 +28,7 @@ export default function ToggleInput({
           id={id}
           name={name}
           required={required}
+          defaultValue={defaultValue}
           {...defaultAttributes}
         />
         <input
@@ -37,11 +38,13 @@ export default function ToggleInput({
           name={name}
           required={required}
           pattern={pattern}
+          defaultValue={defaultToggleValue}
           {...toggleAttributes}
         />
         <input
           className={classNames('btn h-14 w-2/12', styles.roundedButton)}
           type="button"
+          disabled={button.disabled}
           onClick={button.onClick}
           value={button.text}
         />

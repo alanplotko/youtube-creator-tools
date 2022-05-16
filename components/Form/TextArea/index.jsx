@@ -1,5 +1,6 @@
 export default function TextArea({
-  id, name, label, helpText, required, disabled, placeholder, customAttributes, pattern,
+  id, name, label, helpText, required, disabled,
+  placeholder, customAttributes, pattern, defaultValue,
 }) {
   return (
     <div className="form-control w-full">
@@ -24,6 +25,7 @@ export default function TextArea({
         required={required}
         placeholder={placeholder}
         pattern={pattern}
+        defaultValue={defaultValue}
         disabled={disabled}
         readOnly={disabled}
         {...customAttributes}

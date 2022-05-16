@@ -1,9 +1,11 @@
+import Image from 'next/image';
+import Link from 'next/link';
 import classNames from 'classnames';
 import styles from './UploadInput.module.css';
 
 export default function UploadInput({
-  id, name, label, helpText, required, customAttributes,
-  uploadValid, uploadFileName, uploadResultMessage,
+  id, name, label, helpText, required, disabled, customAttributes,
+  uploadValid, uploadFileName, uploadResultMessage, existingThumbnail,
 }) {
   const isValid = uploadValid == null || uploadValid;
   return (
@@ -22,11 +24,26 @@ export default function UploadInput({
       <label className="label pt-0">
         <p className="text-sm text-gray-600">{helpText}</p>
       </label>
-      <div className="flex items-center justify-center w-full">
+      <div className="flex items-center justify-center w-full space-x-5">
+        {existingThumbnail && (
+          <div className="flex-col">
+            <div className="card card-bordered shadow-lg hover:brightness-75">
+              <Link href={existingThumbnail} passHref>
+                <a target="_blank">
+                  <figure className="w-64 h-36 relative">
+                    <Image src={existingThumbnail} layout="fill" alt="Thumbnail" title="View current thumbnail in new tab" />
+                  </figure>
+                </a>
+              </Link>
+            </div>
+          </div>
+        )}
         <label
           className={classNames(styles.uploadContainer, {
-            'border-gray-200 hover:border-gray-300': isValid,
-            'border-red-400 hover:border-red-500': !isValid,
+            'border-gray-200 hover:border-gray-300': isValid && !disabled,
+            'border-red-400 hover:border-red-500': !isValid && !disabled,
+            'cursor-pointer hover:bg-gray-100': !disabled,
+            'cursor-not-allowed bg-gray-200': disabled,
           })}
         >
           <div className="flex flex-col items-center justify-center pt-7">
@@ -53,7 +70,8 @@ export default function UploadInput({
             id={id}
             name={name}
             className="opacity-0 cursor-pointer"
-            required
+            required={required}
+            disabled={disabled}
             {...customAttributes}
           />
         </label>

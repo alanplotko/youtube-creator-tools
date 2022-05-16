@@ -25,7 +25,26 @@ async function createProject(req, res) {
   }
 }
 
-async function updateProject(req, res) {
+async function editProject(req, res) {
+  try {
+    const { saveData, originalSlug } = req.body;
+
+    const updateResponse = await prisma.project.update({
+      where: { slug: originalSlug },
+      data: saveData,
+    });
+
+    return res.status(200).json({
+      project: updateResponse,
+      message: 'Successfully updated project.',
+    });
+  } catch (e) {
+    // Catch all errors
+    return buildError(res, errors.PROJECTS_GENERIC_SAVE_ERROR, { message: e?.message });
+  }
+}
+
+async function addVideosToProject(req, res) {
   const { selections, slug } = req.body;
   if (selections.length === 0) {
     return buildError(res, errors.PROJECTS_NO_SELECTION_ERROR);
@@ -75,9 +94,12 @@ export default async function handler(req, res) {
   if (session) {
     switch (req.method) {
       case 'POST':
+        if (req.body.originalSlug) {
+          return editProject(req, res);
+        }
         return createProject(req, res);
       case 'PUT':
-        return updateProject(req, res);
+        return addVideosToProject(req, res);
       case 'DELETE':
         return archiveProject(req, res);
       default:

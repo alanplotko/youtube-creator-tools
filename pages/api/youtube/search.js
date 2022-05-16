@@ -31,7 +31,7 @@ export default async function handler(req, res) {
     try {
       const videoSearch = await prisma.VideoSearch.upsert({
         where: { user_query: { user, query } },
-        update: {},
+        update: { },
         create: { user, query },
         include: { videos: true },
       });
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
           part: 'snippet',
           forMine: true,
           maxResults: 50,
-          q: query,
+          q: encodeURIComponent(query),
           type: 'video',
           order: 'date',
         },
@@ -105,6 +105,7 @@ export default async function handler(req, res) {
         });
       }
       // Catch YouTube API error
+      console.log(e);
       const error = e?.response?.data?.error;
       if (error) {
         return buildError(res, errors.YOUTUBE_API_GENERIC_ERROR, {

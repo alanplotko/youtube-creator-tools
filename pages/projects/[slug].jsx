@@ -52,7 +52,18 @@ export default function ProjectView({ project }) {
               <h1 className="float-left text-3xl font-medium text-slate-600">
                 Videos
               </h1>
-              <label htmlFor="project" className="btn btn-primary modal-button float-right">Archive Project</label>
+              <div className="flex flex-row justify-end space-x-3">
+                <Link
+                  href={{
+                    pathname: '/projects/edit',
+                    query: { slug: project.slug },
+                  }}
+                  passHref
+                >
+                  <button className="btn btn-primary" type="button">Edit Project</button>
+                </Link>
+                <label htmlFor="project" className="btn btn-primary modal-button float-right">Archive Project</label>
+              </div>
               <input
                 type="checkbox"
                 id="project"

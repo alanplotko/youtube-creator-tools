@@ -84,10 +84,10 @@ export default function TopVideosList({ user }) {
           <div key={video.videoId} className="indicator">
             <span className="indicator-item indicator-start badge badge-primary text-lg p-3 font-semibold select-none">{index + 1}</span>
             <div className="grid w-64 h-36 bg-base-300 place-items-center">
-              <div className="card w-64 h-36 bg-base-100 shadow-lg">
+              <div className="card w-64 h-36 bg-base-100 shadow-lg hover:brightness-75">
                 <Link href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
                   <a target="_blank">
-                    <figure>
+                    <figure className="relative w-64 h-36">
                       <Image src={video.image_thumbnail} layout="fill" alt="Video thumbnail" title={video.title} />
                     </figure>
                   </a>

@@ -27,11 +27,7 @@ export default function Alert({
   }
 
   return (
-    <div
-      className={classNames('alert shadow-md', alertType, className, {
-        'h-10': !includeHeading,
-      })}
-    >
+    <div className={`alert ${alertType} shadow-md ${className} ${!includeHeading ? 'h-10' : ''}`}>
       <div>
         <i
           className={classNames(`bi ${icon} pr-1`, {
