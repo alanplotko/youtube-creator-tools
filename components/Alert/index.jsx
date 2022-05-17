@@ -9,7 +9,7 @@ export default function Alert({
 }) {
   let title;
   let icon;
-  let alertType = `alert-${type}`;
+  const alertType = `alert-${type ?? 'info'}`;
   switch (type) {
     case 'success':
       title = alertHeading ?? 'Successfully saved!';
@@ -20,14 +20,13 @@ export default function Alert({
       icon = 'bi-x-circle';
       break;
     default:
-      alertType = 'alert-info';
       title = alertHeading ?? 'For your information...';
       icon = 'bi-info-circle';
       break;
   }
 
   return (
-    <div className={`alert ${alertType} shadow-md ${className} ${!includeHeading ? 'h-10' : ''}`}>
+    <div className={classNames('alert', alertType, 'shadow-md', className, { 'h-10': !includeHeading })}>
       <div>
         <i
           className={classNames(`bi ${icon} pr-1`, {

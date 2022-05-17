@@ -25,24 +25,24 @@ function handleNameChange(e) {
 
 function handleSlugify(e) {
   e.preventDefault();
-  document.querySelector('input#customSlug').value = toSlug(document.querySelector('input#customSlug').value);
+  document.querySelector('input#slug').value = toSlug(document.querySelector('input#slug').value);
 }
 
-export default function CreateProjectStage1({ editing }) {
+export default function CreateProjectStage1({ project, isEditing }) {
   const defaultState = {
-    override: editing ? isCustomSlug(editing?.name, editing?.slug) : false,
+    override: isEditing ? isCustomSlug(project?.name, project?.slug) : false,
     isLoading: false,
     error: null,
     uploadValid: null,
     uploadResultMessage: 'Attach a file',
     uploadFileName: null,
   };
-  const [state, setState] = useState({ ...defaultState, editing });
+  const [state, setState] = useState({ ...defaultState, isEditing });
 
   const handleOverrideSlug = (e) => {
     e.preventDefault();
-    if (state.override) {
-      document.querySelector('input#customSlug').value = '';
+    if (!state.override) {
+      document.querySelector('input#slug').value = '';
     } else {
       document.querySelector('input#slug').value = toSlug(document.querySelector('input#name').value);
     }
@@ -80,40 +80,32 @@ export default function CreateProjectStage1({ editing }) {
   };
 
   const handleSubmit = async (e) => {
-    console.log(e);
     e.preventDefault();
     setState({
       ...state,
       isLoading: true,
     });
 
-    const project = new FormData(document.querySelector('form#createProject'));
-
-    // Set slug
-    project.set('slug', project.getAll('slug').filter((slug) => slug !== '').pop());
-    const formData = Object.fromEntries(project);
+    const formData = new FormData(document.querySelector('form#createProject'));
+    let saveData = Object.fromEntries(formData);
 
     // Use axios to submit the form
     try {
       // Validate slug if creating a new project or editing the exising slug
-      if (!editing || formData.slug !== editing.slug) {
-        console.log('Validating slug');
-        await axios.post('/api/projects/validate', formData);
+      if (!isEditing || saveData.slug !== project.slug) {
+        await axios.post('/api/projects/validate', saveData);
       }
       // Upload thumbnail if creating a new project or editing the existing thumbnail
-      let saveData = formData;
-      if (!editing || formData.thumbnail.name !== '') {
-        console.log('Uploading thumbnail');
+      if (!isEditing || saveData.thumbnail.name !== '') {
         saveData = await axios
-          .post('/api/projects/upload', project)
+          .post('/api/projects/upload', formData)
           .then((res) => res.data.project);
       } else {
-        console.log('No thumbnail');
         delete saveData.thumbnail;
       }
 
       // Persist project to database
-      const saveResponse = await axios.post('/api/projects', { saveData, originalSlug: editing?.slug });
+      const saveResponse = await axios.post('/api/projects', { saveData, isEditing, originalSlug: project?.slug });
       setState({
         ...defaultState,
         override: state.override,
@@ -121,7 +113,7 @@ export default function CreateProjectStage1({ editing }) {
         projectSlug: saveResponse.data.project.slug,
         projectName: saveResponse.data.project.name,
       });
-      if (!editing) {
+      if (!isEditing) {
         document.querySelector('form#createProject').reset();
       }
     } catch (err) {
@@ -144,7 +136,7 @@ export default function CreateProjectStage1({ editing }) {
           alertText={state.error}
         />
       )}
-      {(state.success && !editing) && (
+      {(state.success && !isEditing) && (
         <Alert
           className="rounded-b-none"
           type="success"
@@ -156,7 +148,7 @@ export default function CreateProjectStage1({ editing }) {
           }}
         />
       )}
-      {(state.success && editing) && (
+      {(state.success && isEditing) && (
         <Alert
           className="rounded-b-none"
           type="success"
@@ -177,9 +169,9 @@ export default function CreateProjectStage1({ editing }) {
                   id="name"
                   name="name"
                   required
-                  disabled={(state.isLoading || (state.success && editing)) ? 'disabled' : ''}
+                  disabled={(state.isLoading || (state.success && isEditing)) ? 'disabled' : ''}
                   placeholder="Triangle Strategy Playthrough"
-                  defaultValue={editing?.name}
+                  defaultValue={project?.name}
                   customAttributes={{
                     onChange: handleNameChange,
                   }}
@@ -190,28 +182,26 @@ export default function CreateProjectStage1({ editing }) {
                   label="Project Slug"
                   helpText="The slug for the project page URL. Only lowercase letters, numbers, and dashes are allowed."
                   id="slug"
-                  toggleId="customSlug"
                   name="slug"
                   required
                   pattern="^[a-z0-9](-?[a-z0-9])*$"
-                  defaultValue={editing ? toSlug(editing?.name) : null}
+                  toggleCondition={state.override}
+                  defaultValue={isEditing ? toSlug(project?.name) : null}
                   defaultToggleValue={
-                    (editing && isCustomSlug(editing?.name, editing?.slug)) ? editing?.slug : null
+                    (isEditing && isCustomSlug(project?.name, project?.slug)) ? project?.slug : null
                   }
                   defaultAttributes={{
                     readOnly: 'readOnly',
-                    hidden: state.override,
                     onInput: handleSlugify,
                   }}
                   toggleAttributes={{
-                    hidden: !state.override,
-                    disabled: (state.isLoading || (state.success && editing)) ? 'disabled' : '',
+                    disabled: (state.isLoading || (state.success && isEditing)) ? 'disabled' : '',
                   }}
                   button={{
                     hidden: !state.override,
                     onClick: handleOverrideSlug,
                     text: state.override ? 'Reset' : 'Override',
-                    disabled: (state.isLoading || (state.success && editing)) ? 'disabled' : '',
+                    disabled: (state.isLoading || (state.success && isEditing)) ? 'disabled' : '',
                   }}
                 />
 
@@ -222,8 +212,8 @@ export default function CreateProjectStage1({ editing }) {
                   id="description"
                   name="description"
                   required
-                  disabled={(state.isLoading || (state.success && editing)) ? 'disabled' : ''}
-                  defaultValue={editing?.description}
+                  disabled={(state.isLoading || (state.success && isEditing)) ? 'disabled' : ''}
+                  defaultValue={project?.description}
                   placeholder="Gameplay for the Triangle Strategy playthrough on Nintendo Switch."
                 />
 
@@ -233,12 +223,12 @@ export default function CreateProjectStage1({ editing }) {
                   helpText="Upload a custom thumbnail for this project (3MB limit, type = PNG, JPG, or JPEG)."
                   id="thumbnail"
                   name="thumbnail"
-                  required={editing === null}
-                  disabled={(state.isLoading || (state.success && editing)) ? 'disabled' : ''}
+                  required={!isEditing}
+                  disabled={(state.isLoading || (state.success && isEditing)) ? 'disabled' : ''}
                   uploadValid={state.uploadValid}
                   uploadFileName={state.uploadFileName}
                   uploadResultMessage={state.uploadResultMessage}
-                  existingThumbnail={editing?.image_thumbnail}
+                  existingThumbnail={project?.image_thumbnail}
                   customAttributes={{
                     onChange: handleSizeLimitCheck,
                   }}
@@ -247,7 +237,7 @@ export default function CreateProjectStage1({ editing }) {
                   <button
                     id="submit"
                     type="submit"
-                    disabled={(state.isLoading || (state.success && editing)) ? 'disabled' : ''}
+                    disabled={(state.isLoading || (state.success && isEditing)) ? 'disabled' : ''}
                     className={classNames('btn btn-primary btn-wide', {
                       loading: state.isLoading,
                     })}

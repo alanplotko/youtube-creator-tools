@@ -56,11 +56,20 @@ export default function ProjectView({ project }) {
                 <Link
                   href={{
                     pathname: '/projects/edit',
-                    query: { slug: project.slug },
+                    query: { slug: project.slug, step: 1 },
                   }}
                   passHref
                 >
                   <button className="btn btn-primary" type="button">Edit Project</button>
+                </Link>
+                <Link
+                  href={{
+                    pathname: '/projects/edit',
+                    query: { slug: project.slug, step: 2 },
+                  }}
+                  passHref
+                >
+                  <button className="btn btn-primary" type="button">Edit Videos</button>
                 </Link>
                 <label htmlFor="project" className="btn btn-primary modal-button float-right">Archive Project</label>
               </div>

@@ -69,6 +69,30 @@ async function addVideosToProject(req, res) {
   }
 }
 
+async function updateVideosForProject(req, res) {
+  const { selections, slug } = req.body;
+  if (selections.length === 0) {
+    return buildError(res, errors.PROJECTS_NO_SELECTION_ERROR);
+  }
+  try {
+    const result = await prisma.project.update({
+      where: { slug },
+      data: {
+        videos: {
+          set: selections,
+        },
+      },
+    });
+    return res.status(200).json({
+      data: result,
+      message: `Successfully updated project with ${selections.length} newly selected videos.`,
+    });
+  } catch (e) {
+    // Catch all errors
+    return buildError(res, errors.PROJECTS_GENERIC_UPDATE_ERROR, { message: e?.message });
+  }
+}
+
 async function archiveProject(req, res) {
   // Update archive flag to true
   const { slug } = req.query;
@@ -94,11 +118,14 @@ export default async function handler(req, res) {
   if (session) {
     switch (req.method) {
       case 'POST':
-        if (req.body.originalSlug) {
+        if (req.body.isEditing) {
           return editProject(req, res);
         }
         return createProject(req, res);
       case 'PUT':
+        if (req.body.isEditing) {
+          return updateVideosForProject(req, res);
+        }
         return addVideosToProject(req, res);
       case 'DELETE':
         return archiveProject(req, res);

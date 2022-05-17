@@ -10,7 +10,7 @@ import { useState } from 'react';
 // eslint-disable-next-line sort-imports
 import styles from './CreateProjectStage2.module.css';
 
-export default function CreateProjectStage2({ project, completeCallback }) {
+export default function CreateProjectStage2({ project, completeCallback, isEditing }) {
   const defaultState = {
     isSubmitLoading: false,
     isSearchLoading: false,
@@ -66,14 +66,21 @@ export default function CreateProjectStage2({ project, completeCallback }) {
       return;
     }
     try {
-      const response = await axios.put('/api/projects', { selections, slug: project.slug });
+      let response;
+      if (isEditing) {
+        response = await axios.put('/api/projects', { selections, slug: project.slug, isEditing });
+      } else {
+        response = await axios.put('/api/projects', { selections, slug: project.slug });
+      }
       setState({
         ...state,
         success: response.data.message,
       });
       document.querySelector('fieldset#searchFields').disabled = 'disabled';
       document.querySelector('fieldset#selectFields').disabled = 'disabled';
-      completeCallback();
+      if (!isEditing) {
+        completeCallback();
+      }
     } catch (err) {
       const error = err?.response?.data?.error;
       setState({

@@ -55,11 +55,11 @@ export default function Navigation() {
               </label>
               <ul tabIndex="0" className="mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52 text-lg">
                 {userNavigation.map((link) => (
-                  <Link key={link.name} href={link.path} passHref>
-                    <li>
+                  <li key={link.name}>
+                    <Link key={link.name} href={link.path} passHref>
                       <a>{link.name}</a>
-                    </li>
-                  </Link>
+                    </Link>
+                  </li>
                 ))}
                 <li>
                   <button type="button" onClick={() => signOut()}>Sign out</button>
