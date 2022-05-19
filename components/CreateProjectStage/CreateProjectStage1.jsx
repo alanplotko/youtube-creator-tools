@@ -110,8 +110,8 @@ export default function CreateProjectStage1({ project, isEditing }) {
         ...defaultState,
         override: state.override,
         success: true,
-        projectSlug: saveResponse.data.project.slug,
-        projectName: saveResponse.data.project.name,
+        projectSlug: saveResponse.data.response.slug,
+        projectName: saveResponse.data.response.name,
       });
       if (!isEditing) {
         document.querySelector('form#createProject').reset();

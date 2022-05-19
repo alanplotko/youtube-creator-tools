@@ -5,6 +5,7 @@ import SearchInput from '@/components/Form/SearchInput';
 import axios from 'axios';
 import classNames from 'classnames';
 import { errors } from '@/constants/errors';
+import moment from 'moment';
 import { truncateString } from '@/lib/macros';
 import { useState } from 'react';
 // eslint-disable-next-line sort-imports
@@ -211,6 +212,11 @@ export default function CreateProjectStage2({ project, completeCallback, isEditi
                       Video ID:
                       {' '}
                       {video.videoId}
+                    </p>
+                    <p className="text-sm opacity-50">
+                      Published on:
+                      {' '}
+                      {moment(video.publishedAt).format('MMMM D, YYYY, h:mm a')}
                     </p>
                     <p>{video.description ? truncateString(video.description, 200) : 'No description'}</p>
                     <div className="card-actions justify-end">

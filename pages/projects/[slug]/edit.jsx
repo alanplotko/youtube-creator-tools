@@ -68,7 +68,7 @@ export async function getServerSideProps(context) {
   const slug = context?.query?.slug;
   const step = context?.query?.step;
 
-  if (slug && (step === '1' || step === '2')) {
+  if (slug && ['1', '2'].includes(step)) {
     const project = await prisma.project.findUnique({ where: { slug } });
     if (project !== null && !project.archived) {
       return {

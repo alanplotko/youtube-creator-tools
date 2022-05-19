@@ -53,25 +53,40 @@ export default function ProjectView({ project }) {
                 Videos
               </h1>
               <div className="flex flex-row justify-end space-x-3">
-                <Link
-                  href={{
-                    pathname: `/projects/${project.slug}/edit`,
-                    query: { step: 1 },
-                  }}
-                  passHref
-                >
-                  <button className="btn btn-primary" type="button">Edit Project</button>
-                </Link>
-                <Link
-                  href={{
-                    pathname: `/projects/${project.slug}/edit`,
-                    query: { step: 2 },
-                  }}
-                  passHref
-                >
-                  <button className="btn btn-primary" type="button">Edit Videos</button>
-                </Link>
-                <label htmlFor="project" className="btn btn-primary modal-button float-right">Archive Project</label>
+                <div className="dropdown dropdown-hover">
+                  <label tabIndex="0" className="btn btn-primary gap-2">
+                    <i className="bi bi-pencil-fill" />
+                    Edit...
+                  </label>
+                  <ul tabIndex="0" className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li>
+                      <Link
+                        href={{
+                          pathname: `/projects/${project.slug}/edit`,
+                          query: { step: 1 },
+                        }}
+                        passHref
+                      >
+                        <a>Edit Project</a>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href={{
+                          pathname: `/projects/${project.slug}/edit`,
+                          query: { step: 2 },
+                        }}
+                        passHref
+                      >
+                        <a>Edit Videos</a>
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
+                <label htmlFor="project" className="btn btn-primary modal-button float-right gap-2">
+                  <i className="bi bi-archive-fill" />
+                  Archive Project
+                </label>
               </div>
               <input
                 type="checkbox"

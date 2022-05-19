@@ -33,7 +33,13 @@ export default async function handler(req, res) {
         where: { user_query: { user, query } },
         update: { },
         create: { user, query },
-        include: { videos: true },
+        include: {
+          videos: {
+            orderBy: {
+              publishedAt: 'desc',
+            },
+          },
+        },
       });
 
       // Search query already exists and is non-empty
@@ -67,7 +73,7 @@ export default async function handler(req, res) {
           },
         } = video;
         const result = await uploadThumbnail(url, `${user}/${query}/${videoId}`);
-        const item = {
+        return {
           user,
           videoId,
           publishedAt,
@@ -76,22 +82,32 @@ export default async function handler(req, res) {
           tags: video?.snippet?.tags?.join(',') ?? null,
           image_thumbnail: result.secure_url,
         };
-        return {
-          create: item,
-          update: item,
-          where: { videoId },
-        };
       }));
 
+      // Create (or update) underlying videos in Video schema
+      await prisma.$transaction(
+        videos.map((video) => prisma.Video.upsert({
+          where: { videoId: video.videoId },
+          update: video,
+          create: video,
+        })),
+      );
+
+      // Update user's top videos to point to latest 10 (since top 10 videos can change)
       const result = await prisma.VideoSearch.update({
         where: { user_query: { user, query } },
         data: {
+          query, // Force update of updatedAt timestamp
           videos: {
-            upsert: videos,
+            set: videos.map((video) => ({ videoId: video.videoId })),
           },
         },
         include: {
-          videos: true,
+          videos: {
+            orderBy: {
+              publishedAt: 'desc',
+            },
+          },
         },
       });
 
@@ -105,7 +121,6 @@ export default async function handler(req, res) {
         });
       }
       // Catch YouTube API error
-      console.log(e);
       const error = e?.response?.data?.error;
       if (error) {
         return buildError(res, errors.YOUTUBE_API_GENERIC_ERROR, {

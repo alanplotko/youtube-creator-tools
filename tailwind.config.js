@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -11,7 +12,7 @@ module.exports = {
     require('@tailwindcss/line-clamp'),
   ],
 
-  // daisyUI config (optional)
+  // DaisyUI config (optional)
   daisyui: {
     themes: ['corporate'],
   },
