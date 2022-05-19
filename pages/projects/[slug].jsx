@@ -55,8 +55,8 @@ export default function ProjectView({ project }) {
               <div className="flex flex-row justify-end space-x-3">
                 <Link
                   href={{
-                    pathname: '/projects/edit',
-                    query: { slug: project.slug, step: 1 },
+                    pathname: `/projects/${project.slug}/edit`,
+                    query: { step: 1 },
                   }}
                   passHref
                 >
@@ -64,8 +64,8 @@ export default function ProjectView({ project }) {
                 </Link>
                 <Link
                   href={{
-                    pathname: '/projects/edit',
-                    query: { slug: project.slug, step: 2 },
+                    pathname: `/projects/${project.slug}/edit`,
+                    query: { step: 2 },
                   }}
                   passHref
                 >
