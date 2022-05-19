@@ -59,6 +59,10 @@ export const errors = {
     code: 400,
     message: 'Slug already exists, please choose a different title or override the slug.',
   },
+  PROJECTS_SLUG_NOT_FOUND_ERROR: {
+    code: 404,
+    message: 'Project not found.',
+  },
   UNAUTHORIZED: {
     code: 401,
     message: 'Unauthorized, user not signed in.',

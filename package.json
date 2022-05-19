@@ -22,6 +22,7 @@
     "daisyui": "^2.15.0",
     "google-auth-library": "^8.0.1",
     "googleapis": "^100.0.0",
+    "json2csv": "^5.0.7",
     "moment": "^2.29.3",
     "mongodb": "^4.5.0",
     "multiparty": "^4.2.3",

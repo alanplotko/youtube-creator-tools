@@ -53,9 +53,15 @@ export default function ProjectView({ project }) {
                 Videos
               </h1>
               <div className="flex flex-row justify-end space-x-3">
+                <Link href={`/api/projects/${project.slug}/download`} passHref>
+                  <button className="btn btn-primary gap-2" type="button">
+                    <i className="bi bi-cloud-arrow-down-fill text-lg" />
+                    Download Template
+                  </button>
+                </Link>
                 <div className="dropdown dropdown-hover">
                   <label tabIndex="0" className="btn btn-primary gap-2">
-                    <i className="bi bi-pencil-fill" />
+                    <i className="bi bi-pencil-fill text-lg" />
                     Edit...
                   </label>
                   <ul tabIndex="0" className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
@@ -84,7 +90,7 @@ export default function ProjectView({ project }) {
                   </ul>
                 </div>
                 <label htmlFor="project" className="btn btn-primary modal-button float-right gap-2">
-                  <i className="bi bi-archive-fill" />
+                  <i className="bi bi-archive-fill text-lg" />
                   Archive Project
                 </label>
               </div>
