@@ -6,13 +6,13 @@ import prisma from '@/lib/prisma';
 const secret = process.env.NEXTAUTH_SECRET;
 
 async function createProject(req, res) {
-  const project = req.body.saveData;
+  const { saveData } = req.body;
 
   // Save project to projects schema
   try {
-    await prisma.project.create({ data: project });
+    const response = await prisma.project.create({ data: saveData });
     return res.status(200).json({
-      project,
+      response,
       message: 'Successfully saved project.',
     });
   } catch (e) {
