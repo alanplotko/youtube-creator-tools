@@ -98,8 +98,24 @@ model Project {
     archived        Boolean  @default(false)
     published       Boolean  @default(false)
     videos          Video[]
+    template        Template?
 
     @@index([user, archived, createdAt(sort: Desc)])
+}
+
+model Template {
+    id                      String   @id @default(cuid())
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
+    gameTitle               String
+    leadingText             String
+    gameSynopsis            String
+    links                   String
+    hashtags                String
+    tags                    String
+    description             String
+    project                 Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    projectId               String
 }
 
 model ChannelStats {

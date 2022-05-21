@@ -41,9 +41,9 @@ export default function ProjectView({ project }) {
               <h1 className="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{project.name}</h1>
               <div className="h-1 w-60 bg-primary rounded" />
               <p className="text-sm mt-2 font-bold">
-                Created on
+                Project last updated on
                 {' '}
-                {moment(project.createdAt).format('MMMM D, YYYY, h:mm a')}
+                {moment(project.updatedAt).format('MMMM D, YYYY, h:mm a')}
               </p>
             </div>
             <p className="lg:w-1/2 w-full leading-relaxed text-gray-600">{project.description}</p>
@@ -56,7 +56,7 @@ export default function ProjectView({ project }) {
                 <Link href={`/api/projects/${project.slug}/download`} passHref>
                   <button className="btn btn-primary gap-2" type="button">
                     <i className="bi bi-cloud-arrow-down-fill text-lg" />
-                    Download Template
+                    Download CSV
                   </button>
                 </Link>
                 <div className="dropdown dropdown-hover">
@@ -65,6 +65,11 @@ export default function ProjectView({ project }) {
                     Edit...
                   </label>
                   <ul tabIndex="0" className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <li>
+                      <Link href={`/projects/${project.slug}/template`} passHref>
+                        <a>Edit Template</a>
+                      </Link>
+                    </li>
                     <li>
                       <Link
                         href={{
@@ -180,7 +185,12 @@ export async function getServerSideProps(context) {
     };
   }
   const { slug } = context.params;
-  const project = await prisma.project.findUnique({ where: { slug }, include: { videos: true } });
+  const project = await prisma.project.findUnique({
+    where: { slug },
+    include: {
+      videos: true,
+    },
+  });
   if (project == null || project.archived || !project.published) {
     return {
       redirect: {

@@ -103,8 +103,24 @@ model Project {
     published       Boolean  @default(false)
     videoIds        String[] @db.ObjectId
     videos          Video[]  @relation(fields: [videoIds], references: [id])
+    template        Template?
 
     @@index([user, archived, createdAt(sort: Desc)])
+}
+
+model Template {
+    id                      String   @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt               DateTime @default(now())
+    updatedAt               DateTime @updatedAt
+    gameTitle               String
+    leadingText             String
+    gameSynopsis            String
+    links                   String
+    hashtags                String
+    tags                    String
+    description             String
+    projectId               String  @db.ObjectId
+    project                 Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
 
 model ChannelStats {

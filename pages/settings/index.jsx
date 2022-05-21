@@ -78,38 +78,6 @@ export default function Settings({ archivedProjects }) {
     return (
       <div className="main-container">
         <h1 className="main-header">Settings</h1>
-        {/* {archivedProjects.length === 0 && (
-          <>
-            <h2 className="main-subheader">Manage Projects</h2>
-            <div className="overflow-x-auto w-full">
-              <table className="table min-w-fit w-1/2">
-                <thead>
-                  <tr>
-                    <th>
-                      <label>
-                        <input type="checkbox" className="checkbox" disabled="disabled" />
-                      </label>
-                    </th>
-                    <th>Project</th>
-                    <th>Description</th>
-                    <th>Archive Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td />
-                    <td className="italic text-gray-600">
-                      No archived projects found.
-                    </td>
-                    <td />
-                    <td />
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </>
-        )} */}
-
         <form id="projectSelect" onSubmit={handleModifyProjects}>
           <h2 className="main-subheader space-x-5">
             <span>Manage Projects</span>

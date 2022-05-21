@@ -26,8 +26,6 @@ export default async function handler(req, res) {
           select: {
             videoId: true,
             title: true,
-            description: true,
-            tags: true,
           },
         },
       },
@@ -37,6 +35,8 @@ export default async function handler(req, res) {
     if (project === null) {
       return buildError(res, errors.PROJECTS_SLUG_NOT_FOUND_ERROR);
     }
+
+    project.videos = project.videos.map((video) => ({ ...video, episode: null }));
 
     const json2csv = new Parser();
     const csv = json2csv.parse(project.videos);
