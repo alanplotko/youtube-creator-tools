@@ -6,6 +6,7 @@
     "dev": "next dev",
     "dbpush:mongodb": "dotenv -e .env.local -- npx prisma db push --schema=./prisma/mongodb.prisma",
     "dbpush:sqlite": "dotenv -e .env.local -- npx prisma db push --schema=./prisma/sqlite.prisma",
+    "prisma": "prisma generate",
     "build": "next build",
     "start": "next start",
     "docker:build": "docker build -t yt-tools .",

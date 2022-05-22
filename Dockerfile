@@ -1,5 +1,10 @@
 # Install dependencies only when needed
 FROM node:16-alpine AS deps
+
+# Read DB schema from build argument
+ARG db
+ENV DB_SCHEMA=$db
+
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -10,7 +15,6 @@ RUN yarn install --frozen-lockfile
 FROM node:16-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/prisma ./prisma
 COPY . .
 
 # Next.js collects completely anonymous telemetry data about general usage.
@@ -18,6 +22,7 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 ENV NEXT_TELEMETRY_DISABLED 1
 
+RUN yarn prisma --schema=./prisma/${DB_SCHEMA}.prisma
 RUN yarn build
 
 # Production image, copy all the files and run next
