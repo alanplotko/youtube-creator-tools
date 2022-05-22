@@ -1,4 +1,7 @@
 import Alert from '@/components/Alert';
+import CSVReaderInput from '@/components/Form/CSVReaderInput';
+import LinkInput from '@/components/Form/LinkInput';
+import TagInput from '@/components/Form/TagInput';
 import TextArea from '@/components/Form/TextArea';
 import TextInput from '@/components/Form/TextInput';
 import axios from 'axios';
@@ -7,16 +10,6 @@ import { getSession } from 'next-auth/react';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
 import { useState } from 'react';
-
-const isValidUrl = (url) => {
-  let link;
-  try {
-    link = new URL(url);
-  } catch (_) {
-    return false;
-  }
-  return link.protocol === 'http:' || link.protocol === 'https:';
-};
 
 const separator = () => '-----------------------------------------------';
 
@@ -35,34 +28,9 @@ export default function SubmitTemplate({ project }) {
     const formData = Object.fromEntries(new FormData(document.querySelector('form#editTemplate')));
 
     try {
-      // Validate hashtags
-      if (formData.hashtags.includes('#')) {
-        throw new Error('Invalid hashtags, please leave the "#" out.');
-      }
-      formData.hashtags = formData.hashtags
-        .replace(/\s/g, '')
-        .split(',')
-        .filter((tag) => tag !== '')
-        .join(',');
-
-      // Validate links
-      formData.links = formData.links.split('\n').map((link) => {
-        const tuple = link.split(',');
-        if (tuple.length !== 2) {
-          throw new Error('Invalid link entry, expected 2 components per line (label and URL)');
-        }
-        if (!isValidUrl(tuple[1].trim())) {
-          throw new Error(`Invalid URL in link entry (${tuple[1].trim()})`);
-        }
-        return `${tuple[0].trim()},${tuple[1].trim()}`;
-      }).join('\n');
-
-      // Clean tags
-      formData.tags = formData.tags.split(',').filter((tag) => tag.trim() !== '').join(',');
-
       // Create formatted description
       formData.description = `${formData.leadingText} ◆ Expand for more!\n\n${separator()}\n★ About ${formData.gameTitle}\n${formData.gameSynopsis}\n`
-        + `${separator()}\n★ Follow Me\n${formData.links.split('\n').map((link) => `► ${link.split(',')[0]}: ${link.split(',')[1]}`).join('\n')}\n`
+        + `${separator()}\n★ Follow Me\n${formData.links.split(',').map((link) => `► ${link.split(';')[0]}: ${link.split(';')[1]}`).join('\n')}\n`
         + `${separator()}\n${formData.hashtags.split(',').map((tag) => `#${tag}`).join(' ')}`;
     } catch (err) {
       setState({
@@ -173,38 +141,52 @@ export default function SubmitTemplate({ project }) {
                 />
 
                 {/* Links */}
-                <TextArea
+                <LinkInput
                   label="Links"
-                  helpText="Comma-separated list of links for the viewer to follow."
+                  helpText="Comma-separated list of &quot;label;link&quot; for the viewer to follow."
                   id="links"
                   name="links"
                   required
-                  placeholder="Twitch,https://www.twitch.tv/<your username>"
-                  defaultValue={project?.template?.links}
+                  placeholder="Twitch;https://www.twitch.tv/<your username>"
+                  defaultValue={project?.template?.links.split(',')}
                   disabled={(state.isLoading || state.success) ? 'disabled' : ''}
                 />
 
                 {/* Hashtags */}
-                <TextArea
+                <TagInput
                   label="Hashtags"
-                  helpText="Comma-separated list of hashtags (excluding the #) for the end of the description."
+                  helpText="Comma-separated list of hashtags for the end of the description. No spaces or hashtags, non-alphanumeric characters will be removed."
                   id="hashtags"
                   name="hashtags"
                   required
-                  placeholder="Kirby,KirbyandtheForgottenLand,MouthfulMode,NintendoSwitch,Nintendo"
-                  defaultValue={project?.template?.hashtags}
+                  validation={/[^a-z0-9]+/gi}
+                  placeholder="E.g. NintendoSwitch"
+                  defaultValue={project?.template?.hashtags.split(',')}
                   disabled={(state.isLoading || state.success) ? 'disabled' : ''}
                 />
 
                 {/* Video Tags */}
-                <TextArea
+                <TagInput
                   label="Video Tags"
                   helpText="Comma-separated list of video tags."
                   id="tags"
                   name="tags"
                   required
-                  placeholder="Kirby and the Forgotten Land​​​,Kirby,Demo,HAL Laboratory,Nintendo Switch,Nintendo,Gameplay"
-                  defaultValue={project?.template?.tags}
+                  placeholder="E.g. Kirby and the Forgotten Land​​​"
+                  defaultValue={project?.template?.tags.split(',')}
+                  disabled={(state.isLoading || state.success) ? 'disabled' : ''}
+                />
+
+                {/* Parse uploaded template */}
+                <CSVReaderInput
+                  label="Upload Video Title Template"
+                  helpText="CSV file containing episode titles and numbers by video ID."
+                  id="titleTemplate"
+                  name="titleTemplate"
+                  defaultValue={
+                    project?.template?.titleTemplate
+                      ? JSON.parse(project?.template?.titleTemplate) : null
+                  }
                   disabled={(state.isLoading || state.success) ? 'disabled' : ''}
                 />
 

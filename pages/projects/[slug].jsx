@@ -1,6 +1,7 @@
 import { getSession, useSession } from 'next-auth/react';
 import { shortenString, truncateString } from '@/lib/macros';
 import Alert from '@/components/Alert';
+import CSVDownloaderInput from '@/components/Form/CSVDownloaderInput';
 import Image from 'next/image';
 import Link from 'next/link';
 import NoDataCard from '@/components/Card/NoDataCard';
@@ -53,12 +54,18 @@ export default function ProjectView({ project }) {
                 Videos
               </h1>
               <div className="flex flex-row justify-end space-x-3">
-                <Link href={`/api/projects/${project.slug}/download`} passHref>
-                  <button className="btn btn-primary gap-2" type="button">
-                    <i className="bi bi-cloud-arrow-down-fill text-lg" />
-                    Download CSV
-                  </button>
-                </Link>
+                <CSVDownloaderInput
+                  label="Download Template"
+                  slug={project.slug}
+                  data={
+                    project.videos
+                      .map((video) => ({
+                        videoId: video.videoId,
+                        title: video.title,
+                        episode: null,
+                      }))
+                  }
+                />
                 <div className="dropdown dropdown-hover">
                   <label tabIndex="0" className="btn btn-primary gap-2">
                     <i className="bi bi-pencil-fill text-lg" />
