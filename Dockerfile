@@ -10,6 +10,7 @@ RUN yarn install --frozen-lockfile
 FROM node:16-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/prisma ./prisma
 COPY . .
 
 # Next.js collects completely anonymous telemetry data about general usage.
@@ -33,7 +34,6 @@ RUN adduser --system --uid 1001 nextjs
 # You only need to copy next.config.js if you are NOT using the default configuration
 COPY --from=builder /app/next.config.mjs ./
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
 
 # Automatically leverage output traces to reduce image size
