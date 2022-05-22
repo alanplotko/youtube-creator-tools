@@ -8,6 +8,9 @@
     "dbpush:sqlite": "dotenv -e .env.local -- npx prisma db push --schema=./prisma/sqlite.prisma",
     "build": "next build",
     "start": "next start",
+    "docker:build": "docker build -t yt-tools .",
+    "docker:start": "docker run -p 3000:3000 yt-tools",
+    "docker": "yarn docker:build && yarn docker:start",
     "lint": "next lint"
   },
   "dependencies": {
