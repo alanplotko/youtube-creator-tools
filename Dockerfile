@@ -1,10 +1,6 @@
 # Install dependencies only when needed
 FROM node:16-alpine AS deps
 
-# Read DB schema from build argument
-ARG db
-ENV DB_SCHEMA=$db
-
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -13,6 +9,11 @@ RUN yarn install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM node:16-alpine AS builder
+
+# Read DB schema from build argument
+ARG db
+ENV DB_SCHEMA=$db
+
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
