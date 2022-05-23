@@ -40,8 +40,8 @@ ARG uid
 ENV GID=$gid
 ENV UID=$uid
 
-RUN addgroup --system --gid ${GID:1001} nodejs
-RUN adduser --system --uid ${UID:1001} nextjs
+RUN addgroup --system --gid ${GID:-1001} nodejs
+RUN adduser --system --uid ${UID:-1001} nextjs
 
 # You only need to copy next.config.js if you are NOT using the default configuration
 COPY --from=builder /app/next.config.mjs ./
