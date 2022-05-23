@@ -24,5 +24,4 @@ jobs:
           tags: ${{ secrets.DOCKER_HUB_TAG }}
           build-args: |
             db=sqlite
-            gid=100
             uid=1038

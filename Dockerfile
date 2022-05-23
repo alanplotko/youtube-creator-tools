@@ -35,12 +35,9 @@ ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
 # Read uid and gid from build args
-ARG gid
 ARG uid
-ENV GID=$gid
 ENV UID=$uid
 
-RUN addgroup --system --gid ${GID:-1001} nodejs
 RUN adduser --system --uid ${UID:-1001} nextjs
 
 # You only need to copy next.config.js if you are NOT using the default configuration
@@ -53,7 +50,7 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-USER nextjs:nodejs
+USER nextjs:100
 
 EXPOSE 3000
 
