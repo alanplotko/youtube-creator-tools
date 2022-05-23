@@ -38,6 +38,8 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Allow overriding UID and GID at runtime with fixuid
+RUN apk --no-cache add curl
+s
 RUN USER=nextjs && \
     GROUP=nodejs && \
     curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.5.1/fixuid-0.5.1-linux-amd64.tar.gz | tar -C /usr/local/bin -xzf - && \
