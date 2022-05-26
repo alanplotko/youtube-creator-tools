@@ -66,6 +66,17 @@ export default function ProjectView({ project }) {
                       }))
                   }
                 />
+                {(
+                  project?.template
+                  && JSON.parse(project.template.titleTemplate).length === project.videos.length)
+                  && (
+                    <Link href={`/projects/${project.slug}/preview`} passHref>
+                      <button type="button" className="btn btn-primary gap-2">
+                        <i className="bi bi-save2-fill" />
+                        Preview Changes
+                      </button>
+                    </Link>
+                  )}
                 <div className="dropdown dropdown-hover">
                   <label tabIndex="0" className="btn btn-primary gap-2">
                     <i className="bi bi-pencil-fill text-lg" />
@@ -196,6 +207,7 @@ export async function getServerSideProps(context) {
     where: { slug },
     include: {
       videos: true,
+      template: true,
     },
   });
   if (project == null || project.archived || !project.published) {

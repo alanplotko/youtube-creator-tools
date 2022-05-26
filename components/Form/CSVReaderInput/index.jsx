@@ -118,7 +118,8 @@ export default function CSVReaderInput({
               <tr>
                 <th>#</th>
                 {Object.keys(state.data[0]).map((key) => (
-                  <th key={key}>{key}</th>
+                  // Convert "camelCase" to "Title Case"
+                  <th key={key}>{key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}</th>
                 ))}
               </tr>
             </thead>

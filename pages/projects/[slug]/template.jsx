@@ -32,6 +32,11 @@ export default function SubmitTemplate({ project }) {
       formData.description = `${formData.leadingText} ◆ Expand for more!\n\n${separator()}\n★ About ${formData.gameTitle}\n${formData.gameSynopsis}\n`
         + `${separator()}\n★ Follow Me\n${formData.links.split(',').map((link) => `► ${link.split(';')[0]}: ${link.split(';')[1]}`).join('\n')}\n`
         + `${separator()}\n${formData.hashtags.split(',').map((tag) => `#${tag}`).join(' ')}`;
+      const titleTemplate = JSON.parse(formData.titleTemplate);
+      titleTemplate.forEach((video, index) => {
+        titleTemplate[index].finalTitle = `${video.title} | ${formData.gameTitle} - Episode ${video.episode}`;
+      });
+      formData.titleTemplate = JSON.stringify(titleTemplate);
     } catch (err) {
       setState({
         ...defaultState,
@@ -180,7 +185,7 @@ export default function SubmitTemplate({ project }) {
                 {/* Parse uploaded template */}
                 <CSVReaderInput
                   label="Upload Video Title Template"
-                  helpText="CSV file containing episode titles and numbers by video ID."
+                  helpText="CSV file containing episode titles and numbers by video ID. Titles are required for all videos associated with the project."
                   id="titleTemplate"
                   name="titleTemplate"
                   defaultValue={
