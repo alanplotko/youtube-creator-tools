@@ -3,11 +3,30 @@ import CreateItemCard from '@/components/Card/CreateItemCard';
 import Image from 'next/image';
 import Link from 'next/link';
 import NoDataCard from '@/components/Card/NoDataCard';
+import axios from 'axios';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
+import { useState } from 'react';
 
 export default function Projects({ projects }) {
   const { data: session } = useSession();
+  const defaultState = { error: false, isArchiving: false };
+  const [state, setState] = useState(defaultState);
+
+  const archiveProject = async (e, slug) => {
+    e.preventDefault();
+    document.getElementById(slug).classList.add('loading');
+    setState({ ...state, isArchiving: true });
+    try {
+      await axios.delete('/api/projects', { params: { slug } });
+      document.getElementById(slug).classList.remove('loading');
+      setState({ ...defaultState });
+      window.location.replace('/projects');
+    } catch (err) {
+      document.getElementById(slug).classList.remove('loading');
+      setState({ ...defaultState, error: true });
+    }
+  };
 
   if (session) {
     return (
@@ -68,6 +87,19 @@ export default function Projects({ projects }) {
                       {project.name}
                     </h2>
                     <p className="text-lg line-clamp-2">{project.description}</p>
+                    {!project.published && (
+                      <div className="card-actions justify-end">
+                        <button
+                          id={project.slug}
+                          type="button"
+                          className="btn btn-primary"
+                          disabled={state.isArchiving}
+                          onClick={(e) => { archiveProject(e, project.slug); }}
+                        >
+                          Archive
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>
