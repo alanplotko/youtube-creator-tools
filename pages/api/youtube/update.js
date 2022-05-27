@@ -45,7 +45,6 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ response: response.data });
     } catch (e) {
       // Catch YouTube API error
-      console.log(e);
       const error = e?.response?.data?.error;
       if (error) {
         return buildError(res, errors.YOUTUBE_API_GENERIC_ERROR, {
