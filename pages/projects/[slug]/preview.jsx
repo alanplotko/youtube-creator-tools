@@ -5,6 +5,7 @@ import { getSession } from 'next-auth/react';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
 import { useState } from 'react';
+import ProjectBreadcrumbs from '@/components/ProjectBreadcrumbs';
 
 export default function PreviewTemplate({ project }) {
   const defaultState = {
@@ -72,15 +73,16 @@ export default function PreviewTemplate({ project }) {
             </h1>
             <div className="h-1 w-1/2 bg-primary rounded" />
             {project?.template?.updatedAt && (
-              <p className="text-sm mt-2 font-bold">
+              <p className="text-sm mt-2 mb-10 font-bold">
                 Template last updated on
                 {' '}
                 {moment(project.template.updatedAt).format('MMMM D, YYYY, h:mm a')}
               </p>
             )}
+            <ProjectBreadcrumbs projectTitle={project.name} slug={project.slug} finalPage="Previewing Changes" />
           </div>
           <p className="lg:w-1/2 w-full leading-relaxed text-gray-600">Preview the changes to be applied with the template before committing changes.</p>
-          <div className="my-10 h-0.5 w-full bg-secondary rounded opacity-25" />
+          <div className="mb-10 h-0.5 w-full bg-secondary rounded opacity-25" />
           <div className="w-2/3 px-4 py-5 bg-white sm:p-6 mb-32">
             <label
               htmlFor="confirm-changes-modal"

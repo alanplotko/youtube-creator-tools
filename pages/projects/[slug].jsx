@@ -5,6 +5,7 @@ import CSVDownloaderInput from '@/components/Form/CSVDownloaderInput';
 import Image from 'next/image';
 import Link from 'next/link';
 import NoDataCard from '@/components/Card/NoDataCard';
+import ProjectBreadcrumbs from '@/components/ProjectBreadcrumbs';
 import axios from 'axios';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -41,19 +42,18 @@ export default function ProjectView({ project }) {
             <div className="lg:w-1/2 w-full mb-6 lg:mb-0">
               <h1 className="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900">{project.name}</h1>
               <div className="h-1 w-60 bg-primary rounded" />
-              <p className="text-sm mt-2 font-bold">
+              <p className="text-sm mt-2 mb-10 font-bold">
                 Project last updated on
                 {' '}
                 {moment(project.updatedAt).format('MMMM D, YYYY, h:mm a')}
               </p>
             </div>
             <p className="lg:w-1/2 w-full leading-relaxed text-gray-600">{project.description}</p>
-            <div className="mt-10 h-0.5 w-full bg-secondary rounded opacity-25" />
-            <div className="container mt-5">
-              <h1 className="float-left text-3xl font-medium text-slate-600">
-                Videos
-              </h1>
-              <div className="flex flex-row justify-end space-x-3">
+            <div className="flex flex-row flex-1 place-items-end">
+              <div className="justify-start">
+                <ProjectBreadcrumbs projectTitle={project.name} />
+              </div>
+              <div className="justify-end space-x-3 ml-auto mb-2">
                 <CSVDownloaderInput
                   label="Download Template"
                   slug={project.slug}
@@ -117,6 +117,12 @@ export default function ProjectView({ project }) {
                   Archive Project
                 </label>
               </div>
+            </div>
+            <div className="h-0.5 w-full bg-secondary rounded opacity-25 mb-5" />
+            <div className="container mt-5">
+              <h1 className="float-left text-3xl font-medium text-slate-600">
+                Videos
+              </h1>
               <input
                 type="checkbox"
                 id="project"
