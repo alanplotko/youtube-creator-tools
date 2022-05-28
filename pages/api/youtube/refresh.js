@@ -6,7 +6,7 @@ import prisma from '@/lib/prisma';
 import qs from 'qs';
 
 const secret = process.env.NEXTAUTH_SECRET;
-const SEARCH = 'https://youtube.googleapis.com/youtube/v3/search';
+const REFRESH_VIDEOS = 'https://www.googleapis.com/youtube/v3/videos';
 
 async function uploadThumbnail(url, id) {
   return cloudinary.uploader.upload(url, {
@@ -26,39 +26,22 @@ export default async function handler(req, res) {
   // Signed in
   if (accessToken) {
     const user = name;
-    const { query } = req.query;
+    const { videoIds } = req.body;
 
     try {
-      const videoSearch = await prisma.VideoSearch.upsert({
-        where: { user_query: { user, query } },
-        update: { },
-        create: { user, query },
-        include: {
-          videos: {
-            orderBy: {
-              publishedAt: 'desc',
-            },
-          },
-        },
-      });
-
-      // Search query already exists and is non-empty
-      if (videoSearch.videos.length > 0) {
-        return res.status(200).json(videoSearch);
+      if (req.method !== 'POST') {
+        return buildError(res, errors.INVALID_METHOD, { method: req.method });
       }
 
       // Get general channel information
-      const response = await axios.get(SEARCH, {
+      const response = await axios.get(REFRESH_VIDEOS, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
         params: {
-          part: 'snippet',
-          forMine: true,
+          part: ['id', 'snippet'],
           maxResults: 50,
-          q: encodeURIComponent(query),
-          type: 'video',
-          order: 'date',
+          id: videoIds,
         },
         paramsSerializer: (params) => qs.stringify(params, {
           encode: false, arrayFormat: 'repeat',
@@ -67,15 +50,15 @@ export default async function handler(req, res) {
 
       const videos = await Promise.all(response.data.items.map(async (video) => {
         const {
-          id: { videoId },
+          id,
           snippet: {
             title, description, publishedAt, thumbnails: { maxres: { url } },
           },
         } = video;
-        const result = await uploadThumbnail(url, `${user}/${videoId}`);
+        const result = await uploadThumbnail(url, `${user}/${id}`);
         return {
           user,
-          videoId,
+          videoId: id,
           publishedAt,
           title,
           description,
@@ -93,25 +76,7 @@ export default async function handler(req, res) {
         })),
       );
 
-      // Update user's top videos to point to latest 10 (since top 10 videos can change)
-      const result = await prisma.VideoSearch.update({
-        where: { user_query: { user, query } },
-        data: {
-          query, // Force update of updatedAt timestamp
-          videos: {
-            set: videos.map((video) => ({ videoId: video.videoId })),
-          },
-        },
-        include: {
-          videos: {
-            orderBy: {
-              publishedAt: 'desc',
-            },
-          },
-        },
-      });
-
-      return res.status(response.status).json(result);
+      return res.status(response.status).json({ message: 'Refresh completed successfully.' });
     } catch (e) {
       // Catch Prisma error
       if (isPrismaError(e)) {

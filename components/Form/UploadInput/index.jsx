@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import styles from './UploadInput.module.css';
 
 export default function UploadInput({
-  id, name, label, helpText, required, disabled, customAttributes,
+  id, name, label, helpText, required, disabled, customAttributes, multiple = null,
   uploadValid, uploadFileName, uploadResultMessage, existingThumbnail,
 }) {
   const isValid = uploadValid == null || uploadValid;
@@ -72,6 +72,7 @@ export default function UploadInput({
             className="opacity-0 cursor-pointer"
             required={required}
             disabled={disabled}
+            multiple={multiple}
             {...customAttributes}
           />
         </label>

@@ -1,5 +1,4 @@
 import { getSession, useSession } from 'next-auth/react';
-import { shortenString, truncateString } from '@/lib/macros';
 import Alert from '@/components/Alert';
 import CSVDownloaderInput from '@/components/Form/CSVDownloaderInput';
 import Image from 'next/image';
@@ -10,11 +9,18 @@ import axios from 'axios';
 import classNames from 'classnames';
 import moment from 'moment';
 import prisma from '@/lib/prisma';
+import { truncateString } from '@/lib/macros';
 import { useState } from 'react';
 
 export default function ProjectView({ project }) {
   const { data: session } = useSession();
-  const defaultState = { error: false, isArchiving: false, archived: false };
+  const defaultState = {
+    error: false,
+    isArchiving: false,
+    archived: false,
+    isRefreshing: false,
+    refreshed: false,
+  };
   const [state, setState] = useState(defaultState);
 
   const archiveProject = async (e, slug) => {
@@ -26,6 +32,19 @@ export default function ProjectView({ project }) {
       window.location.replace('/projects');
     } catch (err) {
       setState({ ...defaultState, error: true });
+    }
+  };
+
+  const handleRefreshVideos = async (e) => {
+    e.preventDefault();
+    setState({ ...state, isRefreshing: true });
+    try {
+      const videoIds = project.videos.map((video) => video.videoId).join(',');
+      await axios.post('/api/youtube/refresh', { videoIds });
+      setState({ ...defaultState, refreshed: true });
+      window.location.reload();
+    } catch (err) {
+      setState({ ...defaultState });
     }
   };
 
@@ -66,13 +85,22 @@ export default function ProjectView({ project }) {
                       }))
                   }
                 />
+                <button
+                  type="button"
+                  className={classNames('btn btn-primary gap-2', { loading: state.isRefreshing })}
+                  disabled={state.isRefreshing || state.refreshed}
+                  onClick={(e) => handleRefreshVideos(e)}
+                >
+                  <i className="bi bi-youtube text-lg" />
+                  Refresh
+                </button>
                 {(
-                  project?.template
+                  !project?.template
                   && JSON.parse(project.template.titleTemplate).length === project.videos.length)
                   && (
                     <Link href={`/projects/${project.slug}/preview`} passHref>
                       <button type="button" className="btn btn-primary gap-2">
-                        <i className="bi bi-save2-fill" />
+                        <i className="bi bi-save2-fill text-lg" />
                         Preview Changes
                       </button>
                     </Link>
@@ -86,6 +114,11 @@ export default function ProjectView({ project }) {
                     <li>
                       <Link href={`/projects/${project.slug}/template`} passHref>
                         <a>Edit Template</a>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href={`/projects/${project.slug}/thumbnails`} passHref>
+                        <a>Upload Thumbnails</a>
                       </Link>
                     </li>
                     <li>
@@ -112,7 +145,7 @@ export default function ProjectView({ project }) {
                     </li>
                   </ul>
                 </div>
-                <label htmlFor="project" className="btn btn-primary modal-button float-right gap-2">
+                <label htmlFor="project" className="btn btn-primary modal-button gap-2">
                   <i className="bi bi-archive-fill text-lg" />
                   Archive Project
                 </label>
@@ -174,17 +207,20 @@ export default function ProjectView({ project }) {
             />
           )}
           {project.videos.length > 0 && (
-            <section className="text-gray-600 body-font grid md:grid-cols-3 lg:grid-cols-4 gap-4 pb-40">
+            <section className="text-gray-600 body-font grid md:grid-cols-3 gap-4 pb-40">
               {project.videos.map((video) => (
                 <Link key={video.videoId} href={`https://www.youtube.com/watch?v=${video.videoId}`} passHref>
                   <a target="_blank">
                     <div className="flex relative">
-                      <h2 className="absolute z-10 text-xl font-bold text-white w-full bg-black p-3 bg-opacity-50">{truncateString(video.title)}</h2>
-                      <Image className="absolute inset-0 w-full h-full object-cover object-center" layout="fill" src={video.image_thumbnail} alt="Video thumbnail" />
+                      <Image className="w-full h-full object-cover object-center" layout="fill" src={video.image_thumbnail} alt="Video thumbnail" />
                       <div className="px-8 py-10 relative z-10 w-full border-4 border-gray-200 bg-white opacity-0 hover:opacity-100">
-                        <h2 className="tracking-widest text-sm title-font font-medium text-indigo-500 mb-1">{moment(video.publishedAt).fromNow()}</h2>
+                        <h2 className="tracking-widest text-sm title-font font-medium text-indigo-500 mb-1">
+                          Uploaded
+                          {' '}
+                          {moment(video.publishedAt).fromNow()}
+                        </h2>
                         <h1 className="title-font text-lg font-medium text-gray-900 mb-3">{video.title}</h1>
-                        <p className="leading-relaxed">{video.description ? shortenString(video.description) : 'No description'}</p>
+                        <p className="leading-relaxed">{video.description ? truncateString(video.description, 250) : 'No description'}</p>
                       </div>
                     </div>
                   </a>
@@ -212,7 +248,11 @@ export async function getServerSideProps(context) {
   const project = await prisma.project.findUnique({
     where: { slug },
     include: {
-      videos: true,
+      videos: {
+        orderBy: {
+          publishedAt: 'asc',
+        },
+      },
       template: true,
     },
   });
