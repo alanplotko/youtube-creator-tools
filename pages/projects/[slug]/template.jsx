@@ -87,7 +87,7 @@ export default function SubmitTemplate({ project }) {
           </div>
           <p className="lg:w-1/2 w-full leading-relaxed text-gray-600">Set the game, titles, description, and tags for your videos.</p>
           <div className="mb-10 h-0.5 w-full bg-secondary rounded opacity-25" />
-          <div className="w-2/3 px-4 py-5 bg-white space-y-6 sm:p-6 mb-32">
+          <div className="w-full px-4 py-5 bg-white space-y-6 sm:p-6 mb-32">
             <form id="editTemplate" onSubmit={handleSubmit}>
               <fieldset id="fields" className={classNames()}>
                 {state.error && (

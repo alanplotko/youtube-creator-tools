@@ -95,16 +95,17 @@ export default function ProjectView({ project }) {
                   Refresh
                 </button>
                 {(
-                  !project?.template
-                  && JSON.parse(project.template.titleTemplate).length === project.videos.length)
-                  && (
-                    <Link href={`/projects/${project.slug}/preview`} passHref>
-                      <button type="button" className="btn btn-primary gap-2">
-                        <i className="bi bi-save2-fill text-lg" />
-                        Preview Changes
-                      </button>
-                    </Link>
-                  )}
+                  project?.template
+                  && JSON.parse(project.template.titleTemplate).length === project.videos.length
+                )
+                && (
+                  <Link href={`/projects/${project.slug}/preview`} passHref>
+                    <button type="button" className="btn btn-primary gap-2">
+                      <i className="bi bi-save2-fill text-lg" />
+                      Preview Changes
+                    </button>
+                  </Link>
+                )}
                 <div className="dropdown dropdown-hover">
                   <label tabIndex="0" className="btn btn-primary gap-2">
                     <i className="bi bi-pencil-fill text-lg" />
